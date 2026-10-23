@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><meta name="referrer" content="strict-origin-when-cross-origin"><title>Fruit for Thought · 水果运筹学</title>
+<style>:root{color-scheme:light}html,body{margin:0;min-height:100%;background:#fffcf3}body{font:14px/1.5 Arial,"Microsoft YaHei",sans-serif}button{cursor:pointer}button:disabled{cursor:default}button:focus-visible,summary:focus-visible{outline:2px solid #346d52;outline-offset:3px}[hidden]{display:none!important}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}</style>
+</head><body data-game="fruit">
+<script src="storage.js"></script>
+<style>
+#fruit-for-thought { width:100%; }
+#fruit-for-thought .fruit-game {
+  --paper:light-dark(#fffcf3,#202620); --ink:light-dark(#253e32,#f6f0da);
+  --quiet:light-dark(#697163,#bcc5b5); --rule:light-dark(#dce1ce,#4a5649);
+  --soft:light-dark(#f0f1df,#303b2f); --green:light-dark(#226e43,#8ad6a1);
+  --fruit-red:light-dark(#ee5349,#f86961); --rind:light-dark(#3c8a51,#59a66a);
+  --pith:light-dark(#c8dc77,#cfe78b); --orange:light-dark(#ff9d30,#ffb04b);
+  --cherry:light-dark(#c52c4a,#f05c78); --leaf:light-dark(#2e764b,#5cab72);
+  --fruit-cream:light-dark(#ffe8a5,#fff0c7); --seed:light-dark(#354233,#3b3f2e);
+  --gold:light-dark(#f5ce4b,#efc33f); --on-gold:#3c3020;
+  --on-green:light-dark(#fffdf3,#152e1c);
+  --red-text:light-dark(#ad2c3d,#ff98a5);
+  position:relative; box-sizing:border-box; width:100%; max-width:736px; margin:auto;
+  overflow:hidden; padding:28px 32px 24px; background:var(--paper); color:var(--ink);
+  font:15px/1.55 Arial,"Microsoft YaHei",sans-serif;
+}
+#fruit-for-thought .fruit-game *, #fruit-for-thought .fruit-game *::before, #fruit-for-thought .fruit-game *::after {box-sizing:border-box;}
+#fruit-for-thought [hidden] {display:none !important;}
+#fruit-for-thought .game-brand {font:12px/1.4 "Courier New",monospace; letter-spacing:.16em; padding-right:96px; margin:0 0 9px; color:var(--green);}
+#fruit-for-thought h2 {font:500 31px/1.25 Georgia,"Microsoft YaHei",serif; letter-spacing:-.03em; color:var(--ink); margin:0;}
+#fruit-for-thought .game-intro {margin:8px 0 20px; font-size:13px; color:var(--quiet);}
+#fruit-for-thought .score-row {display:flex; align-items:center; gap:14px; border-top:1px solid var(--rule); padding-top:14px;}
+#fruit-for-thought .chapter {font-size:13px; font-weight:600; color:var(--green);}
+#fruit-for-thought .scoreboard {margin-left:auto; display:flex; align-items:baseline; gap:7px; font-size:12px; white-space:nowrap; color:var(--quiet);}
+#fruit-for-thought .score {display:inline-block; font:500 30px/1 Georgia,serif; color:var(--ink); min-width:25px; text-align:right;}
+#fruit-for-thought .score.bump {animation:score-pop 420ms ease-out;}
+#fruit-for-thought .phase-copy {margin:7px 0 0; font-size:12px; color:var(--quiet);}
+#fruit-for-thought .feedback {display:flex; align-items:center; justify-content:center; gap:12px; position:relative; height:80px; margin:12px 0 2px; border-radius:4px; color:var(--quiet);}
+#fruit-for-thought .feedback .feedback-value {font:500 44px/1 Georgia,serif; white-space:nowrap;}
+#fruit-for-thought .feedback .feedback-text {display:flex; flex-direction:column; font-size:15px;}
+#fruit-for-thought .feedback small {font-size:12px; font-weight:400; opacity:.85;}
+#fruit-for-thought .feedback[data-kind="idle"] .feedback-value {font-size:25px;}
+#fruit-for-thought .feedback[data-kind="miss"] {background:var(--soft); color:var(--quiet);}
+#fruit-for-thought .feedback[data-kind="hit"] {background:var(--green); color:var(--on-green);}
+#fruit-for-thought .feedback[data-kind="double"] {background:var(--orange); color:var(--on-gold);}
+#fruit-for-thought .feedback[data-kind="critical"] {background:var(--gold); color:var(--on-gold);}
+#fruit-for-thought .feedback[data-kind="critical"] .feedback-value {font-size:58px; font-weight:600;}
+#fruit-for-thought .feedback.pop {animation:feedback-pop 420ms cubic-bezier(.2,.85,.3,1);}
+#fruit-for-thought .fruit-field {position:relative; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin:4px 0 0; isolation:isolate;}
+#fruit-for-thought button {font:inherit; touch-action:manipulation;}
+#fruit-for-thought .fruit-choice {position:relative; min-width:0; padding:8px 4px 14px; color:var(--ink); border:0; border-radius:9px; background:transparent;}
+#fruit-for-thought .fruit-choice:hover:not(:disabled) {background:var(--soft);}
+#fruit-for-thought .fruit-choice:disabled {opacity:1; cursor:default;}
+#fruit-for-thought .fruit-choice .fruit-name {display:block; font-size:16px; font-weight:600; margin:3px 0 4px;}
+#fruit-for-thought .fruit-rule {display:block; min-height:22px; font-size:13px; font-weight:500;}
+#fruit-for-thought .fruit-stat {display:block; font:11px/1.5 Arial,"Microsoft YaHei",sans-serif; color:var(--quiet); min-height:17px;}
+#fruit-for-thought .art-stage {position:relative; display:block; width:100%; height:156px;}
+#fruit-for-thought .fruit-art {position:absolute; top:50%; left:50%; width:150px; height:150px; margin:-75px 0 0 -75px; transform-origin:center 65%;}
+#fruit-for-thought .fruit-art span {display:block; position:absolute;}
+#fruit-for-thought .wm-rind {left:10px; top:40px; width:130px; height:77px; border-radius:5px 5px 78px 78px; background:var(--rind); transform:rotate(-16deg);}
+#fruit-for-thought .wm-pith {left:6px; top:0; width:118px; height:66px; border-radius:0 0 70px 70px; background:var(--pith);}
+#fruit-for-thought .wm-flesh {left:7px; top:0; width:104px; height:56px; border-radius:0 0 65px 65px; background:var(--fruit-red);}
+#fruit-for-thought .wm-seed {width:5px; height:9px; background:var(--seed); border-radius:60% 60% 50% 50%; transform:rotate(var(--tilt));}
+#fruit-for-thought .wm-seed:nth-child(1){left:21px;top:13px;--tilt:20deg}
+#fruit-for-thought .wm-seed:nth-child(2){left:48px;top:10px;--tilt:0deg}
+#fruit-for-thought .wm-seed:nth-child(3){left:76px;top:13px;--tilt:-20deg}
+#fruit-for-thought .wm-seed:nth-child(4){left:33px;top:34px;--tilt:35deg}
+#fruit-for-thought .wm-seed:nth-child(5){left:63px;top:34px;--tilt:-35deg}
+#fruit-for-thought .orange-body {left:29px;top:38px;width:94px;height:91px;border-radius:47% 50% 48% 46%;background:var(--orange);transform:rotate(9deg);}
+#fruit-for-thought .orange-seam {left:45px;top:5px;width:3px;height:81px;background:var(--fruit-cream);opacity:.7;transform:rotate(4deg);}
+#fruit-for-thought .orange-leaf {left:74px;top:19px;width:42px;height:24px;border-radius:100% 0 100% 0;background:var(--leaf);transform:rotate(-9deg);transform-origin:0 100%;}
+#fruit-for-thought .orange-stem {left:72px;top:27px;width:5px;height:17px;border-radius:4px;background:var(--leaf);transform:rotate(-12deg);}
+#fruit-for-thought .orange-dot {width:4px;height:4px;border-radius:50%;background:var(--fruit-cream);opacity:.8;}
+#fruit-for-thought .orange-dot:nth-of-type(2){left:18px;top:30px}
+#fruit-for-thought .orange-dot:nth-of-type(3){left:27px;top:45px}
+#fruit-for-thought .orange-dot:nth-of-type(4){left:17px;top:57px}
+#fruit-for-thought .orange-dot:nth-of-type(5){left:68px;top:62px}
+#fruit-for-thought .orange-dot:nth-of-type(6){left:76px;top:47px}
+#fruit-for-thought .cherry-stem {top:21px;width:47px;height:80px;border:3px solid var(--leaf);border-top:0;border-bottom:0;transform-origin:top center;}
+#fruit-for-thought .cherry-stem.left {left:39px;width:38px;border-right:0;border-radius:100% 0 0 0;transform:rotate(0);}
+#fruit-for-thought .cherry-stem.right {left:77px;width:31px;border-left:0;border-radius:0 100% 0 0;transform:rotate(0);}
+#fruit-for-thought .cherry-leaf {left:73px;top:18px;width:35px;height:18px;border-radius:0 100% 0 100%;background:var(--leaf);transform:rotate(5deg);}
+#fruit-for-thought .cherry-ball {width:53px;height:50px;border-radius:48% 48% 52% 52%;background:var(--cherry);}
+#fruit-for-thought .cherry-ball.left {left:17px;top:81px;transform:rotate(10deg);}
+#fruit-for-thought .cherry-ball.right {left:82px;top:72px;transform:rotate(-9deg);}
+#fruit-for-thought .cherry-glint {width:10px;height:6px;left:11px;top:10px;border-radius:70% 30% 55% 40%;background:var(--fruit-cream);transform:rotate(-35deg);}
+#fruit-for-thought .fruit-choice.hit .fruit-art {animation:fruit-hop 540ms cubic-bezier(.3,.7,.3,1);}
+#fruit-for-thought .fruit-choice.double .fruit-art {animation:fruit-hop 650ms cubic-bezier(.3,.7,.3,1);}
+#fruit-for-thought .fruit-choice.miss .fruit-art {animation:fruit-nope 550ms ease-in-out;filter:saturate(.3);opacity:.6;}
+#fruit-for-thought .fruit-choice.critical .fruit-art {animation:fruit-jackpot 850ms cubic-bezier(.2,.7,.3,1);}
+#fruit-for-thought .fruit-choice.hit .wm-seed, #fruit-for-thought .fruit-choice.critical .wm-seed {animation:seed-jump 650ms ease-out;}
+#fruit-for-thought .fruit-choice.hit .orange-leaf, #fruit-for-thought .fruit-choice.critical .orange-leaf {animation:leaf-wave 650ms ease-in-out;}
+#fruit-for-thought .fruit-choice.hit .cherry-ball, #fruit-for-thought .fruit-choice.critical .cherry-ball {animation:cherry-swing 650ms ease-in-out;}
+#fruit-for-thought .burst {position:absolute;left:50%;top:45%;width:0;height:0;pointer-events:none;z-index:3;}
+#fruit-for-thought .confetti {position:absolute;width:7px;height:12px;border-radius:5px 5px 2px 2px;background:var(--c);animation:fruit-burst var(--duration,750ms) cubic-bezier(.1,.5,.4,1) forwards;}
+#fruit-for-thought .burst-ring {position:absolute;width:110px;height:110px;left:-55px;top:-55px;border:5px solid var(--gold);border-radius:50%;animation:ring-burst 800ms ease-out forwards;}
+#fruit-for-thought .game-bottom {border-top:1px solid var(--rule);margin-top:11px;padding-top:14px;}
+#fruit-for-thought .steps-row {display:flex;align-items:center;gap:12px;}
+#fruit-for-thought .step-track {display:flex;flex:1;gap:4px;min-width:0;}
+#fruit-for-thought .step-mark {display:block;height:5px;min-width:0;flex:1;background:var(--rule);border-radius:2px;}
+#fruit-for-thought .step-mark:nth-child(13){margin-left:7px;}
+#fruit-for-thought .step-mark.done {background:var(--green);}
+#fruit-for-thought .step-mark.critical {background:var(--cherry);}
+#fruit-for-thought .step-count {font:12px/1.5 "Courier New",monospace;color:var(--quiet);white-space:nowrap;}
+#fruit-for-thought .bottom-note {font-size:11px;color:var(--quiet);margin:10px 0 0;}
+#fruit-for-thought .main-action {display:inline-block;border:0;border-radius:4px;background:var(--green);color:var(--on-green);min-height:44px;padding:11px 22px;font-size:14px;font-weight:500;}
+#fruit-for-thought .main-action:hover {filter:brightness(1.08);}
+#fruit-for-thought .ready-row {text-align:center;margin:15px 0 0;}
+#fruit-for-thought .bridge-view {padding:22px 0 8px;}
+#fruit-for-thought .kicker {font:11px/1.4 "Courier New",monospace;letter-spacing:.12em;color:var(--quiet);margin:0 0 10px;}
+#fruit-for-thought h3 {font:500 25px/1.35 Georgia,"Microsoft YaHei",serif;color:var(--ink);margin:0 0 10px;}
+#fruit-for-thought .bridge-copy {font-size:14px;max-width:520px;line-height:1.8;margin:0 0 18px;}
+#fruit-for-thought .reveal-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:10px 0 22px;}
+#fruit-for-thought .reveal-item {padding:11px 6px;text-align:center;background:var(--soft);border-radius:4px;font-size:12px;}
+#fruit-for-thought .reveal-item strong {display:block;font:500 25px/1.4 Georgia,serif;}
+#fruit-for-thought .equal-note {font-size:12px;color:var(--quiet);margin:14px 0 20px;}
+#fruit-for-thought .result-view {padding:23px 0 0;}
+#fruit-for-thought .personality-title {font:600 31px/1.35 Georgia,"Microsoft YaHei",serif;letter-spacing:-.03em;margin:6px 0 8px;color:var(--green);}
+#fruit-for-thought .risk-tag {display:inline-block;background:var(--gold);color:var(--on-gold);border-radius:3px;padding:3px 9px;font-size:13px;font-weight:500;margin:0 0 15px;}
+#fruit-for-thought .personality-quote {font:400 19px/1.55 Georgia,"Microsoft YaHei",serif;margin:0 0 17px;}
+#fruit-for-thought .evidence {display:grid;gap:9px;margin:0;padding:0;list-style:none;}
+#fruit-for-thought .evidence li {font-size:13px;line-height:1.65;padding-left:13px;border-left:2px solid var(--rule);}
+#fruit-for-thought .portrait-label {font-size:12px;color:var(--quiet);margin:24px 0 7px;}
+#fruit-for-thought .fruit-portrait {display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:3px;margin-bottom:20px;}
+#fruit-for-thought .stamp {height:52px;position:relative;}
+#fruit-for-thought .stamp-art {position:absolute;left:50%;top:2px;width:40px;height:40px;margin-left:-20px;}
+#fruit-for-thought .stamp .fruit-art {transform:scale(.27);transform-origin:center;}
+#fruit-for-thought .stamp-score {position:absolute;bottom:0;left:0;right:0;font:11px/1.2 "Courier New",monospace;text-align:center;color:var(--quiet);}
+#fruit-for-thought .stamp-score.big {color:var(--red-text);font-weight:600;}
+#fruit-for-thought .result-foot {display:flex;align-items:center;flex-wrap:wrap;gap:12px;border-top:1px solid var(--rule);padding-top:17px;}
+#fruit-for-thought .result-foot .bottom-note {margin:0;flex:1;min-width:160px;}
+#fruit-for-thought details {margin:18px 0 0;font-size:12px;color:var(--quiet);}
+#fruit-for-thought summary {min-height:32px;}
+#fruit-for-thought .method-copy {font-size:12px;line-height:1.75;margin:8px 0 0;}
+@keyframes fruit-hop {0%,100%{transform:translateY(0) rotate(0)}35%{transform:translateY(-22px) rotate(-7deg) scale(1.05)}70%{transform:translateY(4px) rotate(4deg)}}
+@keyframes fruit-nope {0%,100%{transform:translateX(0) rotate(0)}20%,60%{transform:translateX(-7px) rotate(-6deg)}40%,80%{transform:translateX(7px) rotate(6deg)}}
+@keyframes fruit-jackpot {0%,100%{transform:scale(1) rotate(0)}20%{transform:scale(.83) rotate(-9deg)}48%{transform:translateY(-29px) scale(1.3) rotate(12deg)}75%{transform:translateY(-5px) scale(1.06) rotate(-6deg)}}
+@keyframes fruit-burst {0%{transform:translate(0,0) rotate(0);opacity:1}85%{opacity:1}100%{transform:translate(var(--dx),var(--dy)) rotate(var(--spin));opacity:0}}
+@keyframes ring-burst {0%{transform:scale(.4);opacity:1}100%{transform:scale(2.1);opacity:0}}
+@keyframes score-pop {40%{transform:scale(1.35);color:var(--green)}}
+@keyframes feedback-pop {0%{transform:scale(.94)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
+@keyframes seed-jump {40%{translate:0 -10px}100%{translate:0 0}}
+@keyframes leaf-wave {30%{rotate:-18deg}65%{rotate:12deg}100%{rotate:0deg}}
+@keyframes cherry-swing {30%{translate:-7px -3px}65%{translate:6px 2px}100%{translate:0 0}}
+@media(max-width:480px){
+  #fruit-for-thought .fruit-game{padding:22px 16px 20px;}
+  #fruit-for-thought h2{font-size:26px;}
+  #fruit-for-thought .game-brand{font-size:10px;letter-spacing:.1em;}
+  #fruit-for-thought .game-intro{font-size:12px;}
+  #fruit-for-thought .fruit-field{gap:3px;}
+  #fruit-for-thought .fruit-choice{padding:4px 1px 12px;}
+  #fruit-for-thought .art-stage{height:112px;}
+  #fruit-for-thought .fruit-choice .fruit-art{scale:.64;}
+  #fruit-for-thought .fruit-choice .fruit-name{font-size:14px;}
+  #fruit-for-thought .fruit-rule{font-size:12px;}
+  #fruit-for-thought .fruit-stat{font-size:11px;}
+  #fruit-for-thought .feedback{height:76px;margin-top:10px;}
+  #fruit-for-thought .feedback .feedback-value{font-size:38px;}
+  #fruit-for-thought .feedback .feedback-text{font-size:14px;}
+  #fruit-for-thought .chapter{font-size:12px;}
+  #fruit-for-thought .score-row{gap:8px;}
+  #fruit-for-thought .scoreboard{gap:4px;}
+  #fruit-for-thought .fruit-portrait{grid-template-columns:repeat(6,minmax(0,1fr));}
+  #fruit-for-thought .personality-title{font-size:28px;}
+  #fruit-for-thought .bridge-copy{font-size:13px;}
+}
+@media(prefers-reduced-motion:reduce){
+  #fruit-for-thought *,#fruit-for-thought *::before,#fruit-for-thought *::after {animation-duration:.001ms !important;transition-duration:.001ms !important;}
+  #fruit-for-thought .burst {display:none;}
+}
+</style>
+<div id="fruit-for-thought" >
+  <div class="fruit-game" aria-label="水果运筹学小游戏">
+    <header>
+      <p class="game-brand">FRUIT FOR THOUGHT</p>
+      <h2>今天，你怎么选？</h2>
+      <p class="game-intro">18 次选择，收获一份你的运筹学决策画像。</p>
+    </header>
+    <div class="score-row"><span class="chapter" data-chapter>第一章 · 尝尝再说</span><div class="scoreboard">总分 <strong class="score" data-score>0</strong></div></div>
+    <section class="play-view" aria-label="选择水果">
+      <p class="phase-copy" data-phase-copy>隐藏概率 · 前 12 次，每次得 0 或 1 分</p>
+      <div class="feedback" data-kind="idle" role="status" aria-live="polite" aria-atomic="true"><strong class="feedback-value" data-feedback-value>挑一颗</strong><span class="feedback-text"><span data-feedback-title>尽量多拿分</span><small data-feedback-sub>哪种水果更容易得分？</small></span></div>
+      <div class="fruit-field">
+        <button type="button" class="fruit-choice cursor-interaction" data-fruit="0" aria-label="选择西瓜"><span class="art-stage" data-art="0" aria-hidden="true"></span><span class="fruit-name">西瓜</span><span class="fruit-rule" data-rule="0">得分概率未知</span><span class="fruit-stat" data-stat="0">选 0 次 · 得 0 分</span><span class="burst" aria-hidden="true"></span></button>
+        <button type="button" class="fruit-choice cursor-interaction" data-fruit="1" aria-label="选择橘子"><span class="art-stage" data-art="1" aria-hidden="true"></span><span class="fruit-name">橘子</span><span class="fruit-rule" data-rule="1">得分概率未知</span><span class="fruit-stat" data-stat="1">选 0 次 · 得 0 分</span><span class="burst" aria-hidden="true"></span></button>
+        <button type="button" class="fruit-choice cursor-interaction" data-fruit="2" aria-label="选择樱桃"><span class="art-stage" data-art="2" aria-hidden="true"></span><span class="fruit-name">樱桃</span><span class="fruit-rule" data-rule="2">得分概率未知</span><span class="fruit-stat" data-stat="2">选 0 次 · 得 0 分</span><span class="burst" aria-hidden="true"></span></button>
+      </div>
+      <div class="game-bottom"><div class="steps-row"><div class="step-track" role="img" aria-label="选择进度"></div><span class="step-count" data-step>0 / 18</span></div><p class="bottom-note" data-bottom-note>三种水果的概率各不相同；本轮内保持不变。</p></div>
+      <div class="ready-row" hidden><button type="button" class="main-action cursor-interaction" data-show-result>揭晓我的运筹学性格</button></div>
+    </section>
+    <section class="bridge-view" aria-label="进入第二章" hidden>
+      <p class="kicker">A LITTLE REVEAL</p><h3>第一轮，答案揭晓。</h3>
+      <p class="phase-copy">刚才三种水果的真实得分概率：</p><div class="reveal-grid" data-reveal></div>
+      <h3>接下来，稳一点还是搏一下？</h3>
+      <p class="bridge-copy">最后 6 次，水果会换上公开的新规则：<br>稳赚 +1、50% 得 +2、25% 得 +4。<br><strong>拿到 +4，就触发暴击。</strong></p>
+      <p class="equal-note">三种规则的平均收益都是每次 1 分，波动程度不同。</p>
+      <button type="button" class="main-action cursor-interaction" data-continue>继续 · 最后 6 次</button>
+    </section>
+    <section class="result-view" aria-label="运筹学性格结果" hidden>
+      <p class="kicker">YOUR DECISION PORTRAIT</p>
+      <p class="phase-copy">你这局的运筹学性格</p>
+      <h3 class="personality-title" data-personality></h3><span class="risk-tag" data-risk-tag></span>
+      <p class="personality-quote" data-quote></p>
+      <ul class="evidence" data-evidence></ul>
+      <p class="portrait-label">你的选择，长成了这幅水果拼贴。</p><div class="fruit-portrait" role="img" aria-label="本局18次水果选择与得分" data-portrait></div>
+      <div class="result-foot"><button type="button" class="main-action cursor-interaction" data-replay>再摘一轮</button><p class="bottom-note">根据本轮选择生成的趣味画像，<br>不代表固定人格或经过验证的心理测评。</p></div>
+      <details><summary class="cursor-interaction">这份结果怎么看出来的？</summary><p class="method-copy" data-method></p></details>
+    </section>
+  </div>
+</div>
+<script id="fruit-decision-engine">
+(() => {
+  const names=['西瓜','橘子','樱桃'];
+  const risks=[{p:1,value:1,label:'稳赚 +1',hint:'每次都得分'},{p:.5,value:2,label:'50% 得 +2',hint:'否则得 0 分'},{p:.25,value:4,label:'25% 暴击 +4',hint:'否则得 0 分'}];
+  function random(state){let x=state.rng;x^=x<<13;x^=x>>>17;x^=x<<5;state.rng=x>>>0;return state.rng/4294967296;}
+  function shuffle(a,state){for(let i=a.length-1;i>0;i--){const j=Math.floor(random(state)*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+  function create(seed){const state={version:1,id:String(seed>>>0),rng:(seed>>>0)||918273,probabilities:[],riskOrder:[],history:[],advanced:false,revealed:false};state.probabilities=shuffle([.25,.55,.85],state);state.riskOrder=shuffle([0,1,2],state);return state;}
+  function total(state){return state.history.reduce((s,h)=>s+h.points,0);}
+  function choose(state,arm){
+    if(!Number.isInteger(arm)||arm<0||arm>2||state.history.length>=18||(state.history.length===12&&!state.advanced))return null;
+    const phase=state.history.length<12?0:1;
+    const profile=phase===0?{p:state.probabilities[arm],value:1}:risks[state.riskOrder[arm]];
+    const record={arm,phase,points:random(state)<profile.p?profile.value:0};
+    state.history.push(record);return record;
+  }
+  function personality(state){
+    const h=state.history.filter(x=>x.phase===0), risk=state.history.filter(x=>x.phase===1);
+    const counts=[0,0,0],wins=[0,0,0];let switches=0,longest=0,run=0,previous=-1,eligible=0,follow=0;
+    h.forEach(item=>{
+      if(counts.every(c=>c>=1)){
+        const means=counts.map((n,i)=>wins[i]/n),best=Math.max(...means),worst=Math.min(...means);
+        if(best-worst>=.1){eligible++;if(means[item.arm]>=best-1e-9)follow++;}
+      }
+      if(previous!==-1&&item.arm!==previous)switches++;
+      run=item.arm===previous?run+1:1;longest=Math.max(longest,run);previous=item.arm;
+      counts[item.arm]++;wins[item.arm]+=item.points;
+    });
+    const favorite=counts.indexOf(Math.max(...counts));
+    const firstSix=new Set(h.slice(0,6).map(x=>x.arm)).size;
+    const lastSix=[0,0,0];h.slice(6).forEach(x=>lastSix[x.arm]++);
+    let type,quote,evidence;
+    if(Math.max(...counts)>=9||longest>=7){type='认准派';quote='“认定这一颗，就多给它几次机会。”';evidence=`前 12 次中，${counts[favorite]} 次选择了${names[favorite]}；最长连续选择同一种水果 ${longest} 次。`;}
+    else if(firstSix===3&&Math.max(...lastSix)>=5){type='先探后定派';quote='“先尝一圈，再把机会留给心头好。”';evidence=`前 6 次尝遍三种水果；后 6 次有 ${Math.max(...lastSix)} 次集中选择同一种。`;}
+    else if(eligible>=4&&follow/eligible>=.7){type='证据派';quote='“让已经看到的结果，带我选下一颗。”';evidence=`尝过三种水果后，在 ${eligible} 次样本均分有明显差别的选择中，${follow} 次选择了当时均分最高的水果。`;}
+    else if(new Set(h.map(x=>x.arm)).size===3&&(switches>=7||Math.max(...counts)<=6)){type='探索家';quote='“这颗不错，下一颗会不会更甜？”';evidence=`前 12 次尝遍三种水果，切换了 ${switches} 次；最多的一种选了 ${Math.max(...counts)} 次。`;}
+    else{type='灵活游走派';quote='“留一点坚持，也给别的可能留点位置。”';evidence=`前 12 次切换水果 ${switches} 次，尝试了 ${new Set(h.map(x=>x.arm)).size} 种；最长连续选择同一种 ${longest} 次。`;}
+    const rc=[0,0,0];risk.forEach(x=>rc[state.riskOrder[x.arm]]++);
+    let riskType,riskEvidence;
+    if(rc[0]>=4){riskType='稳稳幸福派';riskEvidence=`最后 6 次有 ${rc[0]} 次选择稳赚 +1；平均收益相同时，你这局更偏向稳定回报。`;}
+    else if(rc[2]>=4){riskType='搏一把派';riskEvidence=`最后 6 次有 ${rc[2]} 次选择 25% 得 +4；你这局更愿意接受落空，换取大回报。`;}
+    else if(rc[1]>=4){riskType='折中派';riskEvidence=`最后 6 次有 ${rc[1]} 次选择 50% 得 +2；你这局偏好介于稳赚与大幅波动之间的选项。`;}
+    else{riskType='混合配置派';riskEvidence=`最后 6 次：稳赚选 ${rc[0]} 次、双倍选 ${rc[1]} 次、暴击选 ${rc[2]} 次；你这局在几种波动程度间做了搭配。`;}
+    return {type,quote,evidence,riskType,riskEvidence,counts,switches,longest,riskCounts:rc};
+  }
+  function valid(s){
+    if(!s||s.version!==1||typeof s.id!=='string'||!Number.isInteger(s.rng)||!Array.isArray(s.history)||s.history.length>18)return false;
+    if(!Array.isArray(s.probabilities)||s.probabilities.slice().sort((a,b)=>a-b).join(',')!=='0.25,0.55,0.85')return false;
+    if(!Array.isArray(s.riskOrder)||s.riskOrder.slice().sort().join(',')!=='0,1,2')return false;
+    if(typeof s.advanced!=='boolean'||typeof s.revealed!=='boolean'||(s.history.length>12&&!s.advanced)||(s.advanced&&s.history.length<12)||(s.revealed&&s.history.length!==18))return false;
+    return s.history.every((x,i)=>Number.isInteger(x.arm)&&x.arm>=0&&x.arm<=2&&x.phase===(i<12?0:1)&&(x.points===0||x.points===(i<12?1:risks[s.riskOrder[x.arm]].value)));
+  }
+  window.FruitDecisionEngine={names,risks,create,total,choose,personality,valid};
+})();
+</script>
+<script>
+(() => {
+  const root=document.getElementById('fruit-for-thought');
+  const E=window.FruitDecisionEngine;
+  const $=selector=>root.querySelector(selector);
+  const buttons=[...root.querySelectorAll('[data-fruit]')];
+  const markup=[
+    '<span class="fruit-art watermelon"><span class="wm-rind"><span class="wm-pith"><span class="wm-flesh"><span class="wm-seed"></span><span class="wm-seed"></span><span class="wm-seed"></span><span class="wm-seed"></span><span class="wm-seed"></span></span></span></span></span>',
+    '<span class="fruit-art orange"><span class="orange-body"><span class="orange-seam"></span><span class="orange-dot"></span><span class="orange-dot"></span><span class="orange-dot"></span><span class="orange-dot"></span><span class="orange-dot"></span></span><span class="orange-stem"></span><span class="orange-leaf"></span></span>',
+    '<span class="fruit-art cherries"><span class="cherry-stem left"></span><span class="cherry-stem right"></span><span class="cherry-leaf"></span><span class="cherry-ball left"><span class="cherry-glint"></span></span><span class="cherry-ball right"><span class="cherry-glint"></span></span></span>'
+  ];
+  buttons.forEach((btn,i)=>btn.querySelector('[data-art]').innerHTML=markup[i]);
+  const track=$('.step-track');
+  for(let i=0;i<18;i++){const mark=document.createElement('span');mark.className='step-mark';track.append(mark);}
+  const fresh=()=>E.create(Math.floor(Math.random()*4294967295)||918273);
+  let state=fresh(),busy=false,timeout=null,portraitId='';
+  const saved=window.gameStorage?.snapshot?.privateContent?.game;
+  if(E.valid(saved))state=structuredClone(saved);
+  function feedback(record){
+    const box=$('.feedback');box.classList.remove('pop');
+    let kind='idle',value='挑一颗',title='尽量多拿分',sub=state.advanced?'三种回报，你更喜欢哪一种？':'哪种水果更容易得分？';
+    if(record){
+      const fruit=E.names[record.arm];value=record.points===0?'0':`+${record.points}`;
+      if(record.points===0){kind='miss';title='扑空了';sub=`${fruit}这次没得分 · 总分不变`;}
+      else if(record.points===1){kind='hit';title='甜！收获一分';sub=`${fruit}得分`;}
+      else if(record.points===2){kind='double';title='双倍收获！';sub=`${fruit}一次带来 2 分`;}
+      else{kind='critical';title='暴击！大丰收';sub=`${fruit}一次带来 4 分`;}
+    }
+    box.dataset.kind=kind;$('[data-feedback-value]').textContent=value;$('[data-feedback-title]').textContent=title;$('[data-feedback-sub]').textContent=sub;
+    if(record){void box.offsetWidth;box.classList.add('pop');}
+  }
+  function render(){
+    const n=state.history.length,isBreak=n===12&&!state.advanced&&!busy,isResult=state.revealed;
+    $('.play-view').hidden=isBreak||isResult;$('.bridge-view').hidden=!isBreak;$('.result-view').hidden=!isResult;
+    $('[data-score]').textContent=E.total(state);
+    $('[data-chapter]').textContent=isResult?'这局的你 · 已揭晓':isBreak?'第一章完成 · 12 / 18':state.advanced?'第二章 · 稳一点，还是搏一下？':'第一章 · 尝尝再说';
+    $('[data-phase-copy]').textContent=state.advanced?'公开概率 · 最后 6 次，三种规则平均收益相同':'隐藏概率 · 前 12 次，每次得 0 或 1 分';
+    $('[data-bottom-note]').textContent=state.advanced?'普通 +1 · 双倍 +2 · 暴击 +4；没有得分时总分不变。':'三种水果的概率各不相同；本轮内保持不变。';
+    buttons.forEach((btn,i)=>{
+      btn.disabled=busy||n>=18;
+      const selected=state.history.filter(x=>x.arm===i&&x.phase===(state.advanced?1:0));
+      $('[data-rule="'+i+'"]').textContent=state.advanced?E.risks[state.riskOrder[i]].label:'得分概率未知';
+      $('[data-stat="'+i+'"]').textContent=state.advanced?`${E.risks[state.riskOrder[i]].hint} · 选${selected.length}次`:`选 ${selected.length} 次 · 得 ${selected.reduce((s,x)=>s+x.points,0)} 分`;
+      btn.setAttribute('aria-label',`选择${E.names[i]}${state.advanced?'，'+E.risks[state.riskOrder[i]].label:''}`);
+    });
+    [...track.children].forEach((mark,i)=>mark.className='step-mark'+(i<n?' done':'')+(state.history[i]?.points===4?' critical':''));
+    track.setAttribute('aria-label',`已选择${n}次，共18次`);$('[data-step]').textContent=`${n} / 18`;
+    $('.ready-row').hidden=n!==18||busy;
+    if(isBreak){
+      const reveal=$('[data-reveal]');reveal.replaceChildren();
+      E.names.forEach((name,i)=>{const item=document.createElement('div');item.className='reveal-item';item.textContent=name;const strong=document.createElement('strong');strong.textContent=Math.round(state.probabilities[i]*100)+'%';item.append(strong);reveal.append(item);});
+    }
+    if(isResult)renderResult();
+  }
+  function renderResult(){
+    const p=E.personality(state);$('[data-personality]').textContent=p.type;$('[data-risk-tag]').textContent='风险风格 · '+p.riskType;$('[data-quote]').textContent=p.quote;
+    const evidence=$('[data-evidence]');evidence.replaceChildren();
+    [p.evidence,p.riskEvidence].forEach(text=>{const li=document.createElement('li');li.textContent=text;evidence.append(li);});
+    const key=state.id+':'+state.history.map(x=>x.arm+','+x.points).join(';');
+    if(portraitId!==key){
+      portraitId=key;const portrait=$('[data-portrait]');portrait.replaceChildren();
+      state.history.forEach((h,i)=>{
+        const stamp=document.createElement('div');stamp.className='stamp';stamp.dataset.tooltip=`第 ${i+1} 次：${E.names[h.arm]}，${h.points} 分`;
+        const art=document.createElement('span');art.className='stamp-art';art.innerHTML=markup[h.arm];art.setAttribute('aria-hidden','true');
+        const points=document.createElement('span');points.className='stamp-score'+(h.points===4?' big':'');points.textContent=h.points===0?'0':`+${h.points}`;
+        stamp.append(art,points);portrait.append(stamp);
+      });
+      portrait.setAttribute('aria-label',state.history.map((h,i)=>`第${i+1}次${E.names[h.arm]}得${h.points}分`).join('；'));
+    }
+    $('[data-method]').textContent='前12次按选择集中度、切换次数、先尝试后集中，以及是否跟随当时观察到的样本均分来归类；只使用你当时看得到的反馈。判定依次检查：同一种至少选9次或连续7次；前6次尝遍且后6次至少5次集中；至少4次可比较时有70%以上跟随样本均分最高项；较均衡或频繁切换；其余为灵活游走。最后6次若同一风险档至少选4次，就标记对应倾向，否则为混合配置。得分高低不决定称号；这些是为小游戏设计的启发式分类。';
+  }
+  function save(){
+    if(!window.gameStorage?.setSnapshot)return;
+    const p=state.history.length===18?E.personality(state):null;
+    window.gameStorage.setSnapshot({modelContent:{game:'水果运筹学',choices:state.history.length,score:E.total(state),criticalHits:state.history.filter(x=>x.points===4).length,decisionStyle:p?.type||null,riskStyle:p?.riskType||null},privateContent:{game:structuredClone(state)}}).catch(()=>{});
+  }
+  function burst(btn,points){
+    const box=btn.querySelector('.burst');box.replaceChildren();if(!points)return;
+    const count=points===4?28:points===2?16:9;
+    const palette=['var(--gold)','var(--fruit-red)','var(--orange)','var(--rind)','var(--cherry)'];
+    for(let i=0;i<count;i++){
+      const piece=document.createElement('span');piece.className='confetti';
+      const angle=(i/count)*Math.PI*2,range=(points===4?94:points===2?68:45)*(0.7+Math.random()*.3);
+      piece.style.setProperty('--dx',Math.cos(angle)*range+'px');piece.style.setProperty('--dy',Math.sin(angle)*range-30+'px');piece.style.setProperty('--spin',(i%2?1:-1)*(90+i*31)+'deg');piece.style.setProperty('--c',palette[i%palette.length]);piece.style.setProperty('--duration',points===4?'950ms':'650ms');box.append(piece);
+    }
+    if(points===4){const ring=document.createElement('span');ring.className='burst-ring';box.append(ring);}
+  }
+  buttons.forEach((btn,i)=>btn.addEventListener('click',()=>{
+    if(busy)return;const record=E.choose(state,i);if(!record)return;busy=true;
+    buttons.forEach(b=>{b.classList.remove('hit','miss','double','critical');b.querySelector('.burst').replaceChildren();});
+    const kind=record.points===0?'miss':record.points===1?'hit':record.points===2?'double':'critical';
+    void btn.offsetWidth;btn.classList.add(kind);feedback(record);burst(btn,record.points);
+    const score=$('[data-score]');score.classList.remove('bump');if(record.points){void score.offsetWidth;score.classList.add('bump');}
+    render();save();
+    timeout=setTimeout(()=>{busy=false;render();if(state.history.length===12&&!state.advanced)$('[data-continue]').focus();},record.points===4?1050:650);
+  }));
+  $('[data-continue]').addEventListener('click',()=>{state.advanced=true;buttons.forEach(b=>{b.classList.remove('hit','miss','double','critical');b.querySelector('.burst').replaceChildren();});feedback(null);render();save();buttons[0].focus();});
+  $('[data-show-result]').addEventListener('click',()=>{state.revealed=true;render();save();$('[data-replay]').focus();});
+  $('[data-replay]').addEventListener('click',()=>{clearTimeout(timeout);busy=false;state=fresh();portraitId='';buttons.forEach(b=>{b.classList.remove('hit','miss','double','critical');b.querySelector('.burst').replaceChildren();});feedback(null);render();save();buttons[0].focus();});
+
+  feedback(state.history.length?state.history.at(-1):null);render();
+})();
+</script>
+
+</body></html>

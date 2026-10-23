@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><meta name="referrer" content="strict-origin-when-cross-origin"><title>Monster Canteen · 小怪兽食堂</title>
+<style>:root{color-scheme:light}html,body{margin:0;min-height:100%;background:#fff9e9}body{font:14px/1.5 Arial,"Microsoft YaHei",sans-serif}button{cursor:pointer}button:disabled{cursor:default}button:focus-visible,summary:focus-visible{outline:2px solid #346d52;outline-offset:3px}[hidden]{display:none!important}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}</style>
+</head><body data-game="canteen">
+<script src="storage.js"></script>
+<style>
+#monster-canteen{width:100%;}
+#monster-canteen .canteen{
+  --paper:light-dark(#fff9e9,#20251f);--ink:light-dark(#293d34,#f4efda);--muted:light-dark(#707668,#b5bfad);
+  --line:light-dark(#d8ddc9,#4a5648);--soft:light-dark(#f1f1de,#303b2b);--floor:light-dark(#e2c99b,#705c3e);
+  --green:light-dark(#438d60,#75c68a);--green-dark:light-dark(#29613e,#458455);--green-light:light-dark(#96d77b,#afea90);
+  --purple:light-dark(#9570c5,#ad8bd7);--purple-dark:light-dark(#6b4d9d,#7d5ab0);--purple-light:light-dark(#c1a2e5,#d4b8ef);
+  --yellow:light-dark(#ecc653,#e6c056);--danger:light-dark(#be4938,#ff9879);--warm:light-dark(#f7e7bc,#58462a);
+  --rice:light-dark(#fffef2,#fff5d6);--seaweed:light-dark(#334d3c,#345640);--bean:light-dark(#ffc65d,#ffd27d);
+  --mouth:#292633;--eye:#fff8e0;--tongue:#ef7f8b;--crumb:light-dark(#d69b48,#e7b862);--on-button:light-dark(#fffdf1,#18241c);
+  --sweat:light-dark(#65a6d1,#93c6e9);
+  box-sizing:border-box;position:relative;max-width:736px;margin:auto;padding:25px 28px 24px;overflow:hidden;
+  background:var(--paper);color:var(--ink);font:14px/1.55 Arial,"Microsoft YaHei",sans-serif;
+}
+#monster-canteen .canteen *{box-sizing:border-box;}
+#monster-canteen [hidden]{display:none!important;}
+#monster-canteen .brand{margin:0 96px 7px 0;font:11px/1.5 "Courier New",monospace;letter-spacing:.15em;color:var(--muted);}
+#monster-canteen h2{font:600 29px/1.3 Arial,"Microsoft YaHei",sans-serif;letter-spacing:.02em;margin:0;color:var(--ink);}
+#monster-canteen .tagline{font-size:12px;color:var(--muted);margin:7px 0 17px;}
+#monster-canteen .hud{display:flex;align-items:center;gap:16px;border-top:2px solid var(--line);padding-top:12px;}
+#monster-canteen .hud-stat{display:flex;align-items:baseline;gap:6px;font-size:12px;white-space:nowrap;color:var(--muted);}
+#monster-canteen .hud-stat strong{font:600 24px/1 "Courier New",monospace;color:var(--ink);}
+#monster-canteen .hud-stat.timer strong{color:var(--green-dark);}
+#monster-canteen button{font:inherit;touch-action:manipulation;border-radius:0;}
+#monster-canteen .pause-button{margin-left:auto;min-height:38px;padding:6px 12px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:12px;}
+#monster-canteen .pause-button:disabled{opacity:.5;}
+#monster-canteen .time-track{height:5px;background:var(--line);margin-top:11px;overflow:hidden;}
+#monster-canteen .time-fill{height:100%;width:100%;background:var(--green);}
+#monster-canteen .dispatch{display:flex;align-items:center;gap:12px;min-height:84px;margin:7px 0 5px;}
+#monster-canteen .next-art{width:60px;height:60px;flex:0 0 60px;image-rendering:pixelated;}
+#monster-canteen .next-copy{min-width:0;}
+#monster-canteen .small-label{font-size:11px;color:var(--muted);}
+#monster-canteen .next-title{font-size:19px;line-height:1.35;font-weight:600;margin:1px 0 2px;}
+#monster-canteen .pending-copy{font-size:11px;color:var(--muted);}
+#monster-canteen .next-copy .urgent{color:var(--danger);font-weight:600;}
+#monster-canteen .patience{width:98px;max-width:100%;height:4px;background:var(--line);margin-top:6px;}
+#monster-canteen .patience-fill{height:100%;background:var(--yellow);width:100%;}
+#monster-canteen .dispatch-hint{margin-left:auto;max-width:190px;text-align:right;font-size:12px;color:var(--muted);}
+#monster-canteen .notice{min-height:27px;margin:0 0 8px;font-size:12px;font-weight:500;color:var(--green-dark);}
+#monster-canteen .notice[data-tone="warning"]{color:var(--danger);}
+#monster-canteen .stage{position:relative;}
+#monster-canteen .lanes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;}
+#monster-canteen .lane{min-width:0;--accent:var(--green);--accent-dark:var(--green-dark);}
+#monster-canteen .lane.purple{--accent:var(--purple);--accent-dark:var(--purple-dark);}
+#monster-canteen .lane-heading{display:flex;align-items:center;justify-content:space-between;gap:5px;padding:7px 0;border-top:4px solid var(--accent);}
+#monster-canteen .lane-heading strong{font-size:17px;color:var(--accent-dark);}
+#monster-canteen .lane-heading .queue-label{font-size:11px;color:var(--muted);}
+#monster-canteen .lane-pref{font-size:11px;color:var(--muted);margin:0 0 2px;}
+#monster-canteen .queue-scene{display:block;width:100%;height:270px;image-rendering:pixelated;}
+#monster-canteen .workload{display:flex;align-items:center;gap:7px;min-height:23px;font-size:11px;color:var(--muted);}
+#monster-canteen .queue-meter{display:flex;gap:3px;flex:1;}
+#monster-canteen .queue-meter span{height:5px;flex:1;background:var(--line);}
+#monster-canteen .queue-meter span.on{background:var(--accent);}
+#monster-canteen .lane[data-pressure="high"] .queue-meter span.on{background:var(--danger);}
+#monster-canteen .lane[data-pressure="high"] .queue-label{color:var(--danger);font-weight:600;}
+#monster-canteen .route-button{display:block;width:100%;min-height:46px;background:var(--accent);border:0;border-bottom:4px solid var(--accent-dark);color:var(--on-button);font-size:14px;font-weight:600;margin-top:7px;padding:9px 5px;}
+#monster-canteen .route-button:hover:not(:disabled){filter:brightness(1.08);}
+#monster-canteen .route-button:active:not(:disabled){translate:0 2px;border-bottom-width:2px;}
+#monster-canteen .route-button:disabled,#monster-canteen .route-button[aria-disabled="true"]{opacity:.48;cursor:default;}
+#monster-canteen .route-button.full{background:var(--warm);border-bottom-color:var(--danger);color:var(--danger);opacity:1;}
+#monster-canteen .overlay{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;padding:15px;background:light-dark(#fff9e9d9,#20251fe0);}
+#monster-canteen .overlay-inner{max-width:360px;text-align:center;padding:21px 24px;background:var(--paper);border:2px solid var(--ink);box-shadow:5px 5px 0 var(--line);}
+#monster-canteen .overlay-inner h3{font-size:22px;line-height:1.4;margin:0 0 12px;color:var(--ink);}
+#monster-canteen .overlay-inner p{font-size:13px;line-height:1.8;margin:0 0 18px;}
+#monster-canteen .main-button{min-height:44px;padding:10px 21px;background:var(--ink);color:var(--paper);border:0;border-bottom:4px solid var(--green-dark);font-weight:600;font-size:14px;}
+#monster-canteen .main-button:hover{filter:brightness(1.1);}
+#monster-canteen .game-footer{font-size:11px;line-height:1.7;color:var(--muted);margin:15px 0 0;padding-top:12px;border-top:1px solid var(--line);}
+#monster-canteen .results{padding:25px 0 2px;}
+#monster-canteen .result-kicker{font:11px/1.5 "Courier New",monospace;letter-spacing:.15em;color:var(--muted);margin:0 0 9px;}
+#monster-canteen .results h3{font:600 27px/1.4 Arial,"Microsoft YaHei",sans-serif;margin:0 0 15px;color:var(--ink);}
+#monster-canteen .result-hero{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:3px 0 18px;}
+#monster-canteen .result-number{font:600 54px/1 "Courier New",monospace;color:var(--green-dark);}
+#monster-canteen .result-number small{font-size:22px;color:var(--muted);}
+#monster-canteen .result-label{font-size:12px;color:var(--muted);margin-top:6px;}
+#monster-canteen .result-art{width:175px;height:100px;image-rendering:pixelated;}
+#monster-canteen .result-stats{display:flex;flex-wrap:wrap;gap:12px 23px;font-size:12px;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+#monster-canteen .result-stats strong{color:var(--ink);font-size:16px;}
+#monster-canteen .result-copy{font-size:13px;line-height:1.8;margin:17px 0;}
+#monster-canteen .result-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+#monster-canteen .secondary-button{min-height:44px;padding:9px 15px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;}
+#monster-canteen .best-note{font-size:11px;color:var(--muted);margin:13px 0 0;}
+@media(max-width:480px){
+  #monster-canteen .canteen{padding:21px 14px 20px;}
+  #monster-canteen h2{font-size:25px;}
+  #monster-canteen .brand{font-size:10px;letter-spacing:.1em;}
+  #monster-canteen .hud{gap:10px;flex-wrap:wrap;}
+  #monster-canteen .hud-stat{gap:4px;font-size:11px;}
+  #monster-canteen .hud-stat strong{font-size:22px;}
+  #monster-canteen .pause-button{padding:5px 9px;min-height:38px;}
+  #monster-canteen .lanes{gap:12px;}
+  #monster-canteen .lane-heading{align-items:flex-start;flex-direction:column;gap:1px;}
+  #monster-canteen .lane-heading strong{font-size:16px;}
+  #monster-canteen .lane-pref{font-size:11px;min-height:34px;}
+  #monster-canteen .dispatch{gap:8px;}
+  #monster-canteen .dispatch-hint{font-size:11px;max-width:84px;}
+  #monster-canteen .next-title{font-size:18px;}
+  #monster-canteen .notice{font-size:11px;min-height:34px;}
+  #monster-canteen .route-button{font-size:12px;}
+  #monster-canteen .overlay{padding:7px;}
+  #monster-canteen .overlay-inner{padding:18px 15px;}
+  #monster-canteen .overlay-inner h3{font-size:20px;}
+  #monster-canteen .overlay-inner p{font-size:12px;}
+  #monster-canteen .result-hero{gap:4px;}
+  #monster-canteen .result-art{width:130px;height:85px;}
+  #monster-canteen .result-number{font-size:44px;}
+  #monster-canteen .results h3{font-size:24px;}
+}
+</style>
+<div id="monster-canteen" >
+  <div class="canteen" aria-label="小怪兽食堂排队游戏">
+    <header><p class="brand">MONSTER CANTEEN</p><h2>小怪兽食堂</h2><p class="tagline">两张嘴，一波高峰。让排队的食物都进肚子里。</p></header>
+    <div class="hud"><span class="hud-stat timer">剩余 <strong data-time>35</strong> 秒</span><span class="hud-stat">吃掉 <strong data-fed>0</strong></span><span class="hud-stat">凉掉 <strong data-lost>0</strong></span><button type="button" class="pause-button cursor-interaction" data-pause disabled>暂停</button></div>
+    <div class="time-track" role="progressbar" aria-label="本局剩余时间" aria-valuemin="0" aria-valuemax="35" aria-valuenow="35"><div class="time-fill"></div></div>
+    <div class="game-view">
+      <div class="dispatch"><canvas class="next-art" width="120" height="120" role="img" aria-label="下一份食物"></canvas><div class="next-copy"><div class="small-label">下一份</div><div class="next-title" data-next-title>等开饭</div><div class="pending-copy" data-pending>食物会自动到达</div><div class="patience"><div class="patience-fill"></div></div></div><div class="dispatch-hint">点按钮分配<br>键盘 ← / →</div></div>
+      <p class="notice" data-tone="normal" role="status" aria-live="polite" aria-atomic="true">看一眼队伍，再决定送给谁。</p>
+      <div class="stage">
+        <div class="lanes">
+          <section class="lane" data-lane="0" aria-label="青团队列"><div class="lane-heading"><strong>青团</strong><span class="queue-label">空肚子</span></div><p class="lane-pref">豆子吃得快 · 饭团慢慢嚼</p><canvas class="queue-scene" role="img" aria-label="青团等待开饭"></canvas><div class="workload"><div class="queue-meter" aria-hidden="true"></div><span class="work-time">0.0 秒</span></div><button type="button" class="route-button cursor-interaction" data-route="0" disabled>← 送给青团</button></section>
+          <section class="lane purple" data-lane="1" aria-label="紫芋队列"><div class="lane-heading"><strong>紫芋</strong><span class="queue-label">空肚子</span></div><p class="lane-pref">饭团吃得快 · 豆子慢慢嚼</p><canvas class="queue-scene" role="img" aria-label="紫芋等待开饭"></canvas><div class="workload"><div class="queue-meter" aria-hidden="true"></div><span class="work-time">0.0 秒</span></div><button type="button" class="route-button cursor-interaction" data-route="1" disabled>送给紫芋 →</button></section>
+        </div>
+        <div class="overlay" data-intro><div class="overlay-inner"><h3>肚子已经准备好了。</h3><p>豆子给青团，饭团给紫芋。<br>两只都能吃所有食物，<br><strong>队伍太长，就换一只帮忙！</strong></p><button type="button" class="main-button cursor-interaction" data-start>开饭 · 35 秒</button></div></div>
+        <div class="overlay" data-paused hidden><div class="overlay-inner"><h3>先喘口气。</h3><p>时间和队伍都已暂停。</p><button type="button" class="main-button cursor-interaction" data-resume>继续开饭</button></div></div>
+      </div>
+      <p class="game-footer">每队最多 6 份（含正在吃的）。待分配食物放太久会凉掉；最后 5 秒停止来单，抓紧清台。</p>
+    </div>
+    <section class="results" aria-label="食堂营业结果" hidden><p class="result-kicker">SERVICE COMPLETE</p><h3 data-result-title>打烊啦！</h3><div class="result-hero"><div><div class="result-number"><span data-result-fed>0</span><small data-result-total> / 0</small></div><div class="result-label">份食物成功进肚子</div></div><canvas class="result-art" role="img" aria-label="两只吃饱的小怪兽"></canvas></div><div class="result-stats"><span>凉掉 <strong data-result-lost>0</strong> 份</span><span>未吃完 <strong data-result-left>0</strong> 份</span><span>平均等候 <strong data-result-wait>0</strong> 秒</span></div><p class="result-copy" data-result-copy></p><div class="result-actions"><button type="button" class="main-button cursor-interaction" data-retry>重玩同一波</button><button type="button" class="secondary-button cursor-interaction" data-new>换一波来客</button></div><p class="best-note" data-best></p></section>
+  </div>
+</div>
+<script id="canteen-engine">
+(() => {
+  const DURATION=35,CAPACITY=6,PATIENCE=5;
+  const durations=[[.95,2.8],[2.1,1.65]];
+  function random(s){let x=s.rng;x^=x<<13;x^=x>>>17;x^=x<<5;s.rng=x>>>0;return s.rng/4294967296;}
+  function schedule(seed){
+    const r={rng:(seed>>>0)||192837},list=[];let t=0,i=0;
+    while(t<30){
+      let type;
+      if(t>=8&&t<14)type=random(r)<.85?1:0;
+      else if(t>=14&&t<20)type=random(r)<.85?0:1;
+      else type=random(r)<.5?0:1;
+      list.push({id:i++,born:Number(t.toFixed(5)),type});
+      const interval=t<8?1.06+random(r)*.23:t<22?.56+random(r)*.16:t<27?1.02+random(r)*.2:.61+random(r)*.14;
+      t+=interval;
+    }
+    return list;
+  }
+  function create(seed){return{version:1,seed:seed>>>0,time:0,schedule:schedule(seed),next:0,pending:[],lanes:[[],[]],fed:0,lost:0,waitSum:0,peak:[0,0],matched:0,assigned:0,finished:false};}
+  function begin(job,lane,time){job.start=time;job.due=time+durations[lane][job.type];}
+  function workload(s,lane){return s.lanes[lane].reduce((sum,j,i)=>sum+(i===0?Math.max(0,j.due-s.time):durations[lane][j.type]),0);}
+  function route(s,lane){
+    if(s.finished||!Number.isInteger(lane)||lane<0||lane>1||!s.pending.length)return null;
+    if(s.lanes[lane].length>=CAPACITY)return{kind:'full',lane};
+    const job=s.pending.shift();job.assigned=s.time;job.start=null;job.due=null;
+    if(!s.lanes[lane].length)begin(job,lane,s.time);
+    s.lanes[lane].push(job);s.assigned++;if(job.type===lane)s.matched++;
+    s.peak[lane]=Math.max(s.peak[lane],s.lanes[lane].length);
+    return{kind:'route',lane,id:job.id,type:job.type};
+  }
+  function step(s,dt){
+    if(s.finished)return[];
+    const events=[],target=Math.min(DURATION,s.time+Math.max(0,dt)),eps=1e-8;
+    let guard=0;
+    while(guard++<500){
+      const arrival=s.schedule[s.next]?.born??Infinity;
+      const cool=s.pending.length?s.pending[0].born+PATIENCE:Infinity;
+      const next=Math.min(target,arrival,cool,...s.lanes.map(q=>q[0]?.due??Infinity));
+      s.time=Math.max(s.time,next);
+      for(let lane=0;lane<2;lane++){
+        const q=s.lanes[lane];
+        if(q.length&&q[0].due<=s.time+eps){const job=q.shift();s.fed++;s.waitSum+=job.start-job.born;events.push({kind:'eat',lane,id:job.id,type:job.type,time:s.time});if(q.length)begin(q[0],lane,s.time);}
+      }
+      while(s.schedule[s.next]&&s.schedule[s.next].born<=s.time+eps){
+        if(s.pending.length>=5){const job=s.pending.shift();s.lost++;events.push({kind:'lost',id:job.id,type:job.type,reason:'counter'});}
+        const job={...s.schedule[s.next++]};s.pending.push(job);events.push({kind:'arrival',id:job.id,type:job.type});
+      }
+      while(s.pending.length&&s.pending[0].born+PATIENCE<=s.time+eps){const job=s.pending.shift();s.lost++;events.push({kind:'lost',id:job.id,type:job.type,reason:'cold'});}
+      if(s.time>=target-eps)break;
+    }
+    if(target>=DURATION-eps){s.time=DURATION;s.finished=true;events.push({kind:'finish'});}
+    return events;
+  }
+  function summary(s){return{fed:s.fed,total:s.schedule.length,lost:s.lost,left:s.pending.length+s.lanes[0].length+s.lanes[1].length,averageWait:s.fed?s.waitSum/s.fed:0,peak:s.peak,matched:s.matched,assigned:s.assigned};}
+  function valid(s){
+    if(!s||s.version!==1||!Number.isInteger(s.seed)||!Number.isFinite(s.time)||s.time<0||s.time>DURATION||!Array.isArray(s.schedule)||!Array.isArray(s.pending)||!Array.isArray(s.lanes)||s.lanes.length!==2)return false;
+    if(s.pending.length>5||s.lanes.some(q=>!Array.isArray(q)||q.length>CAPACITY)||!Number.isInteger(s.next)||s.next<0||s.next>s.schedule.length||!Number.isInteger(s.fed)||!Number.isInteger(s.lost)||s.fed<0||s.lost<0)return false;
+    if(s.fed+s.lost+s.pending.length+s.lanes[0].length+s.lanes[1].length!==s.next)return false;
+    if(s.schedule.length!==schedule(s.seed).length||!Array.isArray(s.peak)||s.peak.length!==2)return false;
+    return s.lanes.every(q=>q.every((j,i)=>Number.isInteger(j.id)&&(j.type===0||j.type===1)&&Number.isFinite(j.born)&&(i!==0||(Number.isFinite(j.start)&&Number.isFinite(j.due)))));
+  }
+  window.MonsterCanteenEngine={DURATION,CAPACITY,PATIENCE,durations,create,schedule,route,step,summary,workload,valid};
+})();
+</script>
+<script>
+(() => {
+  const root=document.getElementById('monster-canteen'),E=window.MonsterCanteenEngine;
+  const $=sel=>root.querySelector(sel),names=['青团','紫芋'],foods=['豆子','饭团'];
+  const laneEls=[...root.querySelectorAll('[data-lane]')],buttons=[...root.querySelectorAll('[data-route]')];
+  const canvases=laneEls.map(el=>el.querySelector('canvas'));
+  const seed=()=>Math.floor(Math.random()*4294967295)||192837;
+  let state=E.create(seed()),mode='idle',best={},runId=String(Date.now()),revision=0;
+  let lastFrame=0,lastHUD=0,raf=0,noticeUntil=0,lastEat=-10,chain=0,milestone=0;
+  let colors={},sizes=[],visuals=[new Map(),new Map()],effects=[],swallows=[-10,-10],reject=[-10,-10],queueLevels=[0,0];
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+  const stored=window.gameStorage?.snapshot?.privateContent;
+  if(E.valid(stored?.game)){state=structuredClone(stored.game);mode=state.finished?'ended':stored.mode==='idle'?'idle':'paused';best=stored.best||{};runId=stored.runId||runId;revision=stored.revision||0;}
+  function text(el,value){if(el.textContent!==String(value))el.textContent=String(value);}
+  laneEls.forEach(el=>{for(let i=0;i<6;i++){const s=document.createElement('span');el.querySelector('.queue-meter').append(s);}});
+  function palette(){
+    const style=getComputedStyle($('.canteen'));
+    ['paper','ink','muted','line','soft','floor','green','green-dark','green-light','purple','purple-dark','purple-light','yellow','danger','warm','rice','seaweed','bean','mouth','eye','tongue','crumb','sweat'].forEach(key=>{
+      const probe=document.createElement('span');probe.style.color=`var(--${key})`;probe.hidden=true;$('.canteen').append(probe);colors[key]=getComputedStyle(probe).color;probe.remove();
+    });
+  }
+  function fit(canvas,height){const w=canvas.getBoundingClientRect().width||200,dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(w*dpr);canvas.height=Math.round(height*dpr);const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.imageSmoothingEnabled=false;return{ctx,w,h:height};}
+  function resize(){sizes=canvases.map(c=>fit(c,270));fit($('.next-art'),60);fit($('.result-art'),$('.result-art').getBoundingClientRect().height||100);palette();draw();}
+  function rect(ctx,x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));}
+  function food(ctx,type,x,y,scale=1,worried=false,age=0){
+    ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.scale(scale,scale);
+    if(type===0){
+      rect(ctx,-9,-10,16,3,colors.crumb);rect(ctx,-12,-7,22,15,colors.bean);rect(ctx,-9,8,16,3,colors.crumb);rect(ctx,-12,-4,3,8,colors.crumb);rect(ctx,-5,-7,5,3,colors.eye);
+      rect(ctx,-5,-1,3,3,colors.mouth);rect(ctx,3,-1,3,3,colors.mouth);rect(ctx,-1,5,3,2,colors.mouth);
+    }else{
+      rect(ctx,-4,-16,8,3,colors.floor);rect(ctx,-7,-13,14,3,colors.floor);rect(ctx,-10,-10,20,3,colors.floor);rect(ctx,-13,-7,26,18,colors.floor);rect(ctx,-10,11,20,3,colors.floor);
+      rect(ctx,-3,-15,6,3,colors.rice);rect(ctx,-6,-12,12,3,colors.rice);rect(ctx,-9,-9,18,3,colors.rice);rect(ctx,-12,-6,24,16,colors.rice);rect(ctx,-9,10,18,3,colors.floor);
+      rect(ctx,-5,3,10,10,colors.seaweed);rect(ctx,-7,-2,3,3,colors.mouth);rect(ctx,4,-2,3,3,colors.mouth);
+    }
+    if(worried){rect(ctx,-8,-5,5,2,colors.danger);rect(ctx,3,-5,5,2,colors.danger);if(Math.floor(age*5)%2===0){rect(ctx,11,-13,3,6,colors.sweat);rect(ctx,8,-7,6,3,colors.sweat);}}
+    ctx.restore();
+  }
+  function monster(ctx,lane,x,y,unit,active,pressure,t,pop=false){
+    const body=colors[lane?'purple':'green'],shade=colors[lane?'purple-dark':'green-dark'],light=colors[lane?'purple-light':'green-light'];
+    const animate=mode==='running'&&!reduced.matches;
+    const chew=active&&animate?Math.sin(t*19):0,bob=animate?(active?Math.round(chew*2):Math.round(Math.sin(t*3+lane)*1)):0;
+    ctx.save();ctx.translate(Math.round(x),Math.round(y+bob));
+    const p=(a,b,c,d,color)=>rect(ctx,a*unit,b*unit,c*unit,d*unit,color);
+    if(lane===0){p(2,1,3,3,body);p(12,1,3,3,body);p(3,0,2,1,light);p(12,0,2,1,light);}
+    else{p(7,0,3,3,colors.yellow);p(6,2,5,2,body);}
+    p(3,3,11,1,body);p(1,4,15,2,body);p(0,6,17,10,body);p(1,16,15,1,shade);p(3,17,11,1,shade);
+    p(1,5,2,9,light);p(14,6,3,10,shade);p(3,18,4,2,shade);p(10,18,4,2,shade);
+    p(-2,10,2,4,body);p(17,10,2,4,shade);
+    p(4,6,3,4,colors.eye);p(10,6,3,4,colors.eye);p(5,7,2,2,colors.mouth);p(10,7,2,2,colors.mouth);
+    const open=active?(animate?(chew>.2?5:chew>-.5?4:2):4):pop?4:1;
+    p(5,11,7,open,colors.mouth);
+    if(open>2){p(5,11,2,1,colors.eye);p(10,11,2,1,colors.eye);p(7,11+open-1,3,1,colors.tongue);}
+    else if(!active){p(4,10,1,1,colors.mouth);p(12,10,1,1,colors.mouth);}
+    p(2,10,2,1,colors.tongue);p(13,10,2,1,colors.tongue);
+    if(pressure>=4){p(3,5,4,1,shade);p(10,5,4,1,shade);if(animate&&Math.floor(t*3)%2===0){p(17,3,1,2,colors.sweat);p(16,5,2,2,colors.sweat);}}
+    if(pop&&animate){p(7,-4,1,2,colors.yellow);p(4,-2,2,1,colors.yellow);p(10,-2,2,1,colors.yellow);}
+    ctx.restore();
+  }
+  function drawLane(lane){
+    const {ctx,w,h}=sizes[lane]||{};if(!ctx)return;
+    ctx.clearRect(0,0,w,h);const q=state.lanes[lane],cx=Math.round(w/2),t=state.time;
+    const unit=w<190?3:4,monsterX=cx-8.5*unit,monsterY=260-20*unit,mouthY=monsterY+13*unit;
+    const pressure=q.length,animate=mode==='running'&&!reduced.matches;
+    if(pressure>=4){rect(ctx,cx-36,9,72,173,colors.warm);}
+    rect(ctx,cx-38,7,3,173,colors.line);rect(ctx,cx+35,7,3,173,colors.line);
+    for(let y=15;y<176;y+=18){rect(ctx,cx-40,y,7,3,colors.floor);rect(ctx,cx+33,y,7,3,colors.floor);}
+    rect(ctx,4,261,w-8,7,colors.floor);for(let x=10;x<w-10;x+=20)rect(ctx,x,263,9,2,colors.crumb);
+    const rejectShake=animate&&t-reject[lane]<.35?Math.sin((t-reject[lane])*55)*3:0;
+    monster(ctx,lane,monsterX+rejectShake,monsterY,unit,!!q.length,pressure,t,t-swallows[lane]<.42);
+    const live=new Set();
+    q.forEach((job,i)=>{
+      live.add(job.id);let target=171-i*27;
+      const remaining=i===0?Math.max(0,job.due-t):1,swallow=i===0?Math.max(0,1-remaining/.32):0;
+      const duration=i===0?E.durations[lane][job.type]:1;
+      let pos=visuals[lane].get(job.id);
+      if(!pos){pos={y:reduced.matches?target:5};visuals[lane].set(job.id,pos);}
+      pos.y+=((target-pos.y)*(animate?.18:1));
+      const impatient=t-job.born>3||pressure>=4;
+      const wiggle=animate&&impatient?Math.round(Math.sin(t*(pressure>=5?21:12)+job.id)*Math.min(5,pressure)):0;
+      const jump=animate&&impatient?Math.round(Math.abs(Math.sin(t*7+job.id))*3):0;
+      const y=pos.y+(mouthY-pos.y)*swallow-jump;
+      const size=(w<190?1:1.1)*(1-swallow*.88);
+      if(swallow<.99)food(ctx,job.type,cx+wiggle,y,size,impatient,t+job.id);
+      if(impatient&&i>0&&pressure>=5&&(!animate||Math.floor(t*3+job.id)%3===0)){
+        rect(ctx,cx+19,Math.round(y)-14,3,6,colors.danger);rect(ctx,cx+19,Math.round(y)-6,3,2,colors.danger);
+      }
+      if(i===0){const progress=1-remaining/duration;rect(ctx,cx-29,265,58,3,colors.line);rect(ctx,cx-29,265,58*Math.max(0,progress),3,colors[lane?'purple':'green']);}
+    });
+    for(const id of visuals[lane].keys())if(!live.has(id))visuals[lane].delete(id);
+    effects.filter(e=>e.lane===lane).forEach(e=>{
+      const age=t-e.time;if(age<0||age>1.05)return;
+      ctx.save();ctx.globalAlpha=Math.max(0,1-age/1.05);
+      if(!reduced.matches){for(let j=0;j<8;j++){const angle=j*Math.PI/4;rect(ctx,cx+Math.cos(angle)*age*50,mouthY+Math.sin(angle)*age*34-age*34,3,3,colors[j%2?'bean':'rice']);}}
+      ctx.fillStyle=colors[lane?'purple-dark':'green-dark'];ctx.font='600 14px Arial';ctx.textAlign='center';ctx.fillText(e.chain>=3?`连吃 ×${e.chain}`:'嗝！+1',cx,monsterY-12-(reduced.matches?0:age*18));ctx.restore();
+    });
+  }
+  function drawNext(){
+    const c=$('.next-art'),ctx=c.getContext('2d'),dpr=Math.min(devicePixelRatio||1,2);ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,60,60);
+    const job=state.pending[0];if(job){food(ctx,job.type,30,30,1.6,state.time-job.born>3.3,state.time);}else{rect(ctx,9,36,42,5,colors.floor);rect(ctx,14,41,32,3,colors.crumb);}
+  }
+  function drawResult(){
+    const c=$('.result-art'),{ctx,w,h}=fit(c,c.getBoundingClientRect().height||100),u=w<150?2.5:3;
+    ctx.clearRect(0,0,w,h);monster(ctx,0,w*.25-8.5*u,h-20*u,u,false,0,0);monster(ctx,1,w*.75-8.5*u,h-20*u,u,false,0,0);
+  }
+  function draw(){if(!sizes.length)return;drawLane(0);drawLane(1);drawNext();if(mode==='ended')drawResult();}
+  function notice(message,tone='normal',duration=2.1){text($('.notice'),message);$('.notice').dataset.tone=tone;noticeUntil=state.time+duration;}
+  function defaultNotice(){
+    if(mode==='idle')return'看一眼队伍，再决定送给谁。';
+    if(mode==='paused')return'已暂停，食物不会偷偷凉掉。';
+    if(state.time>=30)return'停止来单！还有 5 秒，抓紧分配、清空队伍。';
+    if(state.time>=8&&state.time<22)return'高峰时段！擅长的那只太忙，就让另一只帮忙。';
+    return'青团爱豆子，紫芋爱饭团。队伍短的，也能帮忙。';
+  }
+  function hud(){
+    const running=mode==='running';
+    text($('[data-time]'),Math.max(0,Math.ceil(E.DURATION-state.time)));text($('[data-fed]'),state.fed);text($('[data-lost]'),state.lost);
+    $('.time-fill').style.width=((E.DURATION-state.time)/E.DURATION*100)+'%';$('.time-track').setAttribute('aria-valuenow',Math.max(0,Math.ceil(E.DURATION-state.time)));
+    const job=state.pending[0];text($('[data-next-title]'),job?foods[job.type]:mode==='idle'?'等开饭':state.next===state.schedule.length?'最后清台':'等下一份');
+    text($('[data-pending]'),job?`待分配 ${state.pending.length} 份${state.time-job.born>3.3?' · 快凉了！':''}`:mode==='idle'?'食物会自动到达':'先让怪兽嚼一会儿');
+    $('[data-pending]').classList.toggle('urgent',!!job&&state.time-job.born>3.3);
+    $('.patience-fill').style.width=job?Math.max(0,1-(state.time-job.born)/E.PATIENCE)*100+'%':'0%';
+    $('.next-art').setAttribute('aria-label',job?`下一份${foods[job.type]}，待分配${state.pending.length}份`:'发餐盘暂时空着');
+    laneEls.forEach((el,i)=>{
+      const q=state.lanes[i],waiting=Math.max(0,q.length-1),work=E.workload(state,i),full=q.length>=E.CAPACITY;
+      el.dataset.pressure=q.length>=5?'high':q.length>=4?'medium':'low';
+      text(el.querySelector('.queue-label'),!q.length?'空肚子':full?'满了！排队 5 份':`正在吃 · 排队 ${waiting} 份`);
+      text(el.querySelector('.work-time'),work.toFixed(1)+' 秒');
+      [...el.querySelector('.queue-meter').children].forEach((mark,j)=>mark.className=j<q.length?'on':'');
+      buttons[i].disabled=!running;buttons[i].setAttribute('aria-disabled',String(!running||!job));buttons[i].classList.toggle('full',full);
+      text(buttons[i],full?`${names[i]}满了 · 换一边`:i===0?'← 送给青团':'送给紫芋 →');
+      buttons[i].setAttribute('aria-label',`送给${names[i]}`);
+      canvases[i].setAttribute('aria-label',`${names[i]}${q.length?'正在吃'+foods[q[0].type]:'空闲'}，${waiting}份排队，全部吃完约需${work.toFixed(1)}秒`);
+    });
+    $('[data-pause]').disabled=mode==='idle'||mode==='ended';text($('[data-pause]'),mode==='paused'?'继续':'暂停');
+    $('[data-intro]').hidden=mode!=='idle';$('[data-paused]').hidden=mode!=='paused';$('.game-view').hidden=mode==='ended';$('.results').hidden=mode!=='ended';
+    if(state.time>=noticeUntil&&mode!=='ended')text($('.notice'),defaultNotice());
+  }
+  function save(){
+    if(!window.gameStorage?.setSnapshot)return;revision++;
+    window.gameStorage.setSnapshot({modelContent:{game:'小怪兽食堂',mode,secondsPlayed:Math.round(state.time),fed:state.fed,lost:state.lost,total:state.schedule.length,queues:state.lanes.map(q=>q.length)},privateContent:{game:structuredClone(state),mode,best,runId,revision}}).catch(()=>{});
+  }
+  function showResult(persist=true){
+    const result=E.summary(state),key=String(state.seed),old=best[key]||0;
+    const ratio=result.fed/result.total;
+    text($('[data-result-title]'),ratio>=.9?'双厨配合大师！':ratio>=.7?'高峰救火队长！':ratio>=.45?'食堂顺利打烊。':'今天的饭点有点忙。');
+    text($('[data-result-fed]'),result.fed);text($('[data-result-total]'),' / '+result.total);text($('[data-result-lost]'),result.lost);text($('[data-result-left]'),result.left);text($('[data-result-wait]'),result.averageWait.toFixed(1));
+    const imbalance=Math.abs(result.peak[0]-result.peak[1]);
+    text($('[data-result-copy]'),result.lost>5?'发餐盘上有些食物等凉了。下一局先快点分出去，再看两边谁能帮忙。':imbalance>=3?'有一边的队伍明显更长。下一局可以早点分流：不擅长这道菜的怪兽，也能帮忙清台。':ratio>=.85?'这一波分配得很顺！重玩相同来单，试试能否再少留一份、少等一秒。':'高峰时，按喜好分配之外，还要看看谁的队伍短。重玩同一波，试试新的分配节奏。');
+    text($('[data-best]'),old?`同一波最佳：${Math.max(old,result.fed)} 份${result.fed>old?' · 这次刷新了纪录！':''}`:'同一波来单顺序保持不变，可以公平比较两次尝试。');
+    best[key]=Math.max(old,result.fed);const keys=Object.keys(best);if(keys.length>8)delete best[keys[0]];
+    hud();drawResult();if(persist)save();
+  }
+  function handle(events){
+    events.forEach(event=>{
+      if(event.kind==='eat'){
+        chain=state.time-lastEat<1.7?chain+1:1;lastEat=state.time;swallows[event.lane]=state.time;effects.push({...event,time:state.time,chain});
+        if(chain>=3)notice(`连吃 ×${chain}！食堂节奏起来了。`,'normal',1.2);
+      }else if(event.kind==='lost')notice('发餐盘上有一份等凉了，抓紧分配下一份！','warning',1.6);
+      else if(event.kind==='finish'){mode='ended';showResult();}
+    });
+    effects=effects.filter(e=>state.time-e.time<1.1);
+  }
+  function frame(now){
+    if(mode!=='running'){raf=0;return;}
+    const dt=lastFrame?Math.min((now-lastFrame)/1000,.1):0;lastFrame=now;
+    handle(E.step(state,dt));
+    if(state.time>=8&&milestone<1){milestone=1;notice('饭点高峰来了！这一波饭团有点多。','warning',3);}
+    if(state.time>=14&&milestone<2){milestone=2;notice('豆子大军到！留意青团的队伍。','warning',2.7);}
+    if(state.time>=30&&milestone<3){milestone=3;notice('最后 5 秒！停止来单，清台冲刺！','normal',5);}
+    if(now-lastHUD>95){hud();lastHUD=now;}draw();
+    if(mode==='running')raf=requestAnimationFrame(frame);else{hud();draw();raf=0;}
+  }
+  function run(){mode='running';lastFrame=0;noticeUntil=0;handle(E.step(state,0));hud();save();if(!raf)raf=requestAnimationFrame(frame);buttons[0].focus();}
+  function pause(){if(mode!=='running')return;mode='paused';cancelAnimationFrame(raf);raf=0;lastFrame=0;noticeUntil=0;hud();draw();save();}
+  function start(newSeed){
+    cancelAnimationFrame(raf);raf=0;state=E.create(newSeed);runId=String(Date.now())+'-'+newSeed;revision=0;effects=[];visuals=[new Map(),new Map()];swallows=[-10,-10];reject=[-10,-10];queueLevels=[0,0];chain=0;lastEat=-10;milestone=0;run();
+  }
+  function send(lane){
+    if(mode!=='running')return;const event=E.route(state,lane);if(!event)return;
+    if(event.kind==='full'){reject[lane]=state.time;notice(`${names[lane]}的队伍满了，换另一只帮忙！`,'warning',1.5);}
+    else{
+      const level=state.lanes[lane].length;
+      if(level>=5&&queueLevels[lane]<5)notice(`${names[lane]}快堵住了！另一边也能吃这道菜。`,'warning',2);
+      queueLevels=state.lanes.map(q=>q.length);save();
+    }
+    hud();draw();
+  }
+  buttons.forEach((b,i)=>b.addEventListener('click',()=>send(i)));
+  $('[data-start]').addEventListener('click',()=>start(state.seed));
+  $('[data-pause]').addEventListener('click',()=>mode==='paused'?run():pause());
+  $('[data-resume]').addEventListener('click',run);
+  $('[data-retry]').addEventListener('click',()=>start(state.seed));
+  $('[data-new]').addEventListener('click',()=>start(seed()));
+  root.addEventListener('keydown',event=>{
+    if(mode!=='running'||event.repeat||event.altKey||event.ctrlKey||event.metaKey)return;
+    if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();send(event.key==='ArrowLeft'?0:1);}
+  });
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)pause();});
+  window.addEventListener('pagehide',pause);
+  window.addEventListener('message',event=>{if(event.source===parent&&event.origin===location.origin&&event.data?.type==='homepage:pause')pause();});
+  const intersection=new IntersectionObserver(entries=>{if(entries[0]&&!entries[0].isIntersecting)pause();},{threshold:0});intersection.observe(root);
+
+  function showResultWithoutSaving(){showResult(false);}
+  const resizeObserver=new ResizeObserver(resize);canvases.forEach(c=>resizeObserver.observe(c));
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{palette();draw();});
+  resize();hud();if(mode==='ended')showResultWithoutSaving();
+})();
+</script>
+
+</body></html>
