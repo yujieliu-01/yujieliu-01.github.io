@@ -1,5 +1,29 @@
 (() => {
   'use strict';
+  const siteRoot = new URL('../', document.currentScript.src);
+  // Keep previously shared section links working after the move to separate pages.
+  if (location.pathname === siteRoot.pathname || location.pathname === siteRoot.pathname + 'index.html') {
+    const legacyPages = {'#research': 'research/', '#publications': 'research/#publications', '#background': 'background/'};
+    if (legacyPages[location.hash]) {
+      location.replace(new URL(legacyPages[location.hash], siteRoot));
+      return;
+    }
+  }
+  const profileToggle = document.querySelector('.profile-toggle');
+  profileToggle.hidden = false;
+  const closeProfile = () => profileToggle.setAttribute('aria-expanded', 'false');
+  profileToggle.addEventListener('click', () => {
+    profileToggle.setAttribute('aria-expanded', String(profileToggle.getAttribute('aria-expanded') !== 'true'));
+  });
+  document.addEventListener('click', event => {
+    if (!event.target.closest('.profile-contact')) closeProfile();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && profileToggle.getAttribute('aria-expanded') === 'true') {
+      closeProfile();
+      profileToggle.focus();
+    }
+  });
   const dialog = document.querySelector('#game-dialog');
   const container = document.querySelector('.game-frame-container');
   const titles = {fruit: 'Fruit for Thought · 水果运筹学', canteen: 'Monster Canteen · 小怪兽食堂'};
@@ -15,7 +39,7 @@
       trigger = button;
       frame = document.createElement('iframe');
       frame.title = titles[game];
-      frame.src = paths[game];
+      frame.src = new URL(paths[game], siteRoot).href;
       document.querySelector('#game-dialog-title').textContent = game === 'fruit' ? 'A little exploration.' : 'A little coordination.';
       container.replaceChildren(frame);
       document.body.classList.add('game-open');
@@ -38,12 +62,4 @@
     if (event.origin !== location.origin || event.source !== frame?.contentWindow) return;
     if (event.data?.type === 'homepage:close') closeGame();
   });
-  const links = [...document.querySelectorAll('nav a[href^="#"]')];
-  const sections = links.map(a => document.querySelector(a.getAttribute('href')));
-  const observer = new IntersectionObserver(entries => {
-    const visible = entries.filter(entry => entry.isIntersecting).sort((a,b) => a.boundingClientRect.top-b.boundingClientRect.top)[0];
-    if (!visible) return;
-    links.forEach(link => {if(link.hash === '#'+visible.target.id)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current');});
-  }, {rootMargin: '-5% 0px -55% 0px', threshold: 0});
-  sections.forEach(section => observer.observe(section));
 })();
