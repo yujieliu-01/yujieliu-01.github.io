@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#102e32">
+  <meta name="description" content="竹影、灯笼、一碗热汤。来熊猫的夜宵摊，看看小猫与柯基的热闹队伍。">
+  <title>熊猫夜宵摊 · 灯火小巷</title>
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./game.css">
+</head>
+<body>
+<svg class="icon-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+ <symbol id="i-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7Z" fill="currentColor" stroke="none"/></symbol>
+ <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 6v12M16 6v12"/></symbol>
+ <symbol id="i-tune" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16M9 4v6M15 14v6"/></symbol>
+ <symbol id="i-zoom" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5M8 10.5h5M10.5 8v5"/></symbol>
+ <symbol id="i-full" viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></symbol>
+ <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+ <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8" cy="9" r="1.4"/><path d="m4 17 5-5 4 4 3-3 4 4"/></symbol>
+ <symbol id="i-fish" viewBox="0 0 32 24"><path d="M22 12c-4-9-16-9-20 0 4 9 16 9 20 0Zm0 0 8-7v14Z" fill="currentColor" stroke="none"/><circle cx="8" cy="11" r="1.3" fill="#132c30"/></symbol>
+ <symbol id="i-bone" viewBox="0 0 32 24"><path d="M8 8C0-2-3 13 5 13c-6 10 8 14 8 5l8-2c8 8 14-5 6-7 7-8-6-13-8-4Z" fill="currentColor" stroke="none"/></symbol>
+ <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 15A8 8 0 0 1 9 4.5 8.5 8.5 0 1 0 19.5 15Z"/></symbol>
+</svg>
+<div class="page-glow" aria-hidden="true"></div>
+<main class="app">
+ <header class="masthead">
+  <div class="brand"><span class="seal" aria-hidden="true">夜</span><div><p class="eyebrow">BAMBOO LANE · AFTER DARK</p><h1>熊猫夜宵摊<span class="brand-dot">·</span><span class="subname">灯火小巷</span></h1></div></div>
+  <div class="header-actions"><button class="ghost-button" id="help-button" type="button" aria-haspopup="dialog">怎么玩</button></div>
+ </header>
+ <section class="scene-section" aria-label="夜宵摊动态场景">
+  <div class="scene" id="scene-shell">
+   <canvas id="scene-canvas" width="1800" height="1000" tabindex="0" aria-label="夜色中的熊猫竹子小摊。左侧橘猫和柯基沿小巷排队，近处大、远处小；右侧熊猫搅拌热汤，给顾客送餐。营业 60 秒，每 2.5 秒出一锅。用下方按钮安排下一锅，尽量减少闭店积压。"></canvas>
+   <div class="scene-vignette" aria-hidden="true"></div>
+   <div class="scene-topline">
+    <div class="scene-caption"><span class="moon-mark"><svg><use href="#i-moon"/></svg></span><span>竹影摇摇，等一口热乎的。</span></div>
+    <div class="scene-view"><div class="scene-timer timer-label">距收摊 <strong id="game-clock">01:00</strong></div><button class="square-button" id="fullscreen-button" type="button" aria-label="全屏查看场景" title="全屏查看"><svg><use href="#i-full"/></svg></button></div>
+   </div>
+   <div class="queue-hud" role="group" aria-label="等餐人数">
+    <div class="queue-label cat-label"><span class="queue-mark"><svg><use href="#i-fish"/></svg></span><div><span class="queue-name">小猫等罐头</span><strong id="cat-count">2 <small>位</small></strong></div></div>
+    <div class="queue-label dog-label"><span class="queue-mark"><svg><use href="#i-bone"/></svg></span><div><span class="queue-name">柯基等热汤</span><strong id="dog-count">2 <small>位</small></strong></div></div>
+   </div>
+   <div class="stall-bubble" id="stall-bubble" role="status" aria-live="polite">慢慢来，都有份。</div>
+   <div class="scene-bottomline"><div class="live-status"><i id="live-dot"></i><span id="live-status">热汤正好，来来往往</span></div><span class="served-note">今晚已出餐 <b id="served-count">0</b> 位</span></div>
+   <div class="paused-overlay" id="paused-overlay" hidden><div><span>歇一会儿，汤还温着。</span><button id="resume-button" type="button">继续营业 →</button></div></div>
+   <div class="loader" id="loader"><div class="loader-lantern"><span></span></div><p>点亮灯笼，热一锅汤…</p></div>
+  </div>
+ </section>
+ <section class="control-dock game-dock" aria-label="安排下一锅">
+  <div class="playback-group"><button class="start-game" id="play-button" type="button" disabled><svg><use href="#i-play"/></svg><span id="play-label">开摊营业</span></button><div class="batch-info"><span class="control-kicker" id="cooking-label">每锅 2.5 秒</span><span class="batch-hint">切换在下一锅生效</span><div class="cook-progress" role="progressbar" aria-label="当前这一锅制作进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="cooking-progress"></i></div></div></div>
+  <div class="serve-group recipe-group" role="group" aria-label="下一锅菜品">
+   <button class="serve-button fish-button recipe" id="serve-cat" data-mode="cat" aria-pressed="false" type="button" disabled><svg><use href="#i-fish"/></svg><span>鱼罐头<small>小猫 ×3</small></span><kbd>1</kbd><i class="choice-mark">下一锅 ✓</i></button>
+   <button class="serve-button mixed-button recipe selected" id="serve-both" data-mode="mix" aria-pressed="true" type="button" disabled><span class="mixed-icons"><svg><use href="#i-fish"/></svg><svg><use href="#i-bone"/></svg></span><span>两种都做<small>小猫 ×2 · 柯基 ×2</small></span><kbd>2</kbd><i class="choice-mark">下一锅 ✓</i></button>
+   <button class="serve-button soup-button recipe" id="serve-dog" data-mode="dog" aria-pressed="false" type="button" disabled><svg><use href="#i-bone"/></svg><span>骨头汤<small>柯基 ×5</small></span><kbd>3</kbd><i class="choice-mark">下一锅 ✓</i></button>
+  </div>
+ </section>
+ <section class="chart-panel" aria-label="排队积压实时图"><div class="chart-heading"><h2>队伍的起起落落 <span>实时积压</span></h2><div class="chart-legend"><span><i class="total"></i>总人数</span><span><i class="cat"></i>小猫</span><span><i class="dog"></i>柯基</span></div></div><canvas id="backlog-chart" role="img" aria-label="两条队伍和总积压的实时变化"></canvas></section>
+ <footer><span>一间小摊，两份惦记。</span><span class="interaction-note">1 / 2 / 3 选菜 · 空格开始或暂停 · 点点小动物，打个招呼</span></footer>
+</main>
+<dialog class="game-dialog" id="help-dialog" aria-labelledby="help-title"><button class="dialog-close square-button" id="close-help" aria-label="关闭玩法" type="button"><svg><use href="#i-close"/></svg></button><p class="dialog-eyebrow">灯笼亮了，小摊开张</p><h2 id="help-title">60 秒，照顾好两条队伍。</h2><p>小猫吃鱼罐头，柯基喝骨头汤。观察人数，选择下一锅，让收摊时还在等待的客人尽量少。</p><ol><li>每锅 <b>2.5 秒</b>，三种产能分别是 <b>(3,0)、(2,2)、(0,5)</b>。</li><li>开锅时锁定菜品和队首顾客，中途来客等下一锅。切换按钮只影响下一锅。</li><li>出餐后，客人会依次到摊前取餐、带着满罐或热汤离开。</li></ol><p class="rule-details">起始各 2 位；猫和狗独立随机到达，各平均 0.7 位 / 秒。顾客不会离队。结算与两种策略使用同一批客流作对照。</p><button class="dialog-primary" id="got-it" type="button">知道啦 →</button></dialog>
+<dialog class="game-dialog result-dialog" id="result-dialog" aria-labelledby="result-title"><p class="dialog-eyebrow">今夜，灯火与热汤都刚刚好</p><h2 id="result-title">辛苦啦，收摊了。</h2><p>这一晚的等待，都记在这里。</p><div class="result-stats"><div><strong id="r-served">0</strong><span>已出餐</span></div><div><strong id="r-cat">0</strong><span>剩余小猫</span></div><div><strong id="r-dog">0</strong><span>剩余柯基</span></div></div><div class="compare-heading"><span>闭店积压 · 越少越好</span><small>同一批客流</small></div><div id="compare-bars"></div><details><summary>两种对照策略是什么？</summary><p>MaxWeight 每锅最大化 Q · d；LyapOpt 最小化 Σ(Q − d)₊²。均使用同样的初始队列和开锅锁定规则，本局结果不代表所有情况下的优劣。</p></details><div class="result-actions"><button class="dialog-primary" id="retry" type="button">重玩这一晚</button><button class="dialog-secondary" id="new-night" type="button">换一批客流</button><button id="review" type="button">看看曲线 →</button></div></dialog>
+<script type="module" src="./main.js"></script>
+</body>
+</html>

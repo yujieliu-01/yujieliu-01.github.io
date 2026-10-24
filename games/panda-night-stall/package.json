@@ -1,0 +1,8 @@
+{
+  "name": "panda-night-stall",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tests/queue-check.mjs && node --test tests/game.test.mjs"
+  }
+}

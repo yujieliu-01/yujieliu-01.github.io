@@ -25,3 +25,7 @@ The white, gray, and cyan visual design and shared author sidebar follow https:/
 The sidebar on all three academic pages retains Fruit for Thought and Monster Canteen, and adds separate entries for Fruit Bandits Classic (`games/fruit-bandits.html`) and the three-reel version (`games/fruit-bandits-triple.html`). The latter uses the homepage white / slate / cyan palette; the classic version retains its original design.
 
 The three-reel game uses a 100-coin budget and shuffled 40% / 50% / 60% probabilities. Its UCB comparison is calibrated with `node games/bandits-triple/calibrate-ucb.cjs`; the JSON file records training and independent validation results. Run `node games/bandits-triple/engine.test.cjs` and `node games/bandits-triple/ucb.test.cjs` to verify the game and benchmark. Use `node games/bandits-triple/build-preview.cjs` to rebuild the separate offline preview.
+
+## Panda Night Stall
+
+The queueing-game button on all three academic pages opens `games/panda-night-stall/` in a wide dialog. It uses the reviewed v2 artwork and continuous FIFO animation, with a 60-second round, 2.5-second batches, a backlog chart, and matched-traffic strategy comparisons. The old `games/canteen.html` remains available at its existing URL. Run `npm test --prefix games/panda-night-stall` for layout, rules, and motion regression checks. Closing the homepage dialog pauses and unloads the game.
