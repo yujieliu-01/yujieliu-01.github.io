@@ -1,40 +1,33 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><meta name="theme-color" content="#ffffff"><title>Fruit Bandits · 三连水果机</title><link rel="stylesheet" href="bandits-triple/style.css"><script defer src="bandits-triple/engine.js"></script><script defer src="bandits-triple/ucb-benchmark.js"></script><script defer src="bandits-triple/game.js"></script></head>
-<body>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><meta name="theme-color" content="#fff8eb">
+<meta name="description" content="陪小橘玩三台水果机，用100枚硬币收集小鱼干。在一次次选择里，发现探索与利用的小秘密。">
+<title>Fruit Bandits · 猫咪水果机</title>
+<link rel="stylesheet" href="bandits-triple/style.css?v=20261025-cat-arcade">
+<script defer src="bandits-triple/engine.js"></script><script defer src="bandits-triple/ucb-benchmark.js"></script><script defer src="bandits-triple/cat-renderer.js?v=20261025-cat-arcade"></script><script defer src="bandits-triple/game.js?v=20261025-cat-arcade"></script>
+</head><body>
 <svg class="svg-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
-  <symbol id="cherry" viewBox="0 0 100 100">
-    <path d="M29 58Q47 37 54 15Q55 40 74 56" fill="none" stroke="#426d42" stroke-width="5" stroke-linecap="round"/>
-    <path d="M53 17Q72 4 84 15Q72 31 53 21" fill="#668e46"/>
-    <path d="M48 63C49 44 19 43 17 65C14 91 50 94 48 63" fill="#d94d54"/>
-    <path d="M87 65C89 43 58 43 56 64C53 91 88 94 87 65" fill="#bb3648"/>
-    <path d="M24 58l5-3m35 3 5-3" stroke="#ffb6a4" stroke-width="5" stroke-linecap="round"/>
-    <g fill="#4b3235"><circle cx="31" cy="69" r="2"/><circle cx="40" cy="69" r="2"/><circle cx="68" cy="69" r="2"/><circle cx="77" cy="69" r="2"/></g>
-    <path d="M33 76q3 3 5 0m32 0q3 3 5 0" fill="none" stroke="#4b3235" stroke-width="2" stroke-linecap="round"/>
-  </symbol>
-  <symbol id="orange" viewBox="0 0 100 100">
-    <path d="M49 27 52 14" stroke="#52693d" stroke-width="5" stroke-linecap="round"/><path d="M51 20Q67 0 83 12Q72 30 51 20" fill="#64884d"/>
-    <path d="M49 25C5 19 6 87 42 92C90 100 100 25 60 25Z" fill="#ed9d36"/>
-    <path d="M25 46q4-10 11-11" fill="none" stroke="#ffce75" stroke-width="6" stroke-linecap="round"/>
-    <circle cx="41" cy="59" r="3" fill="#54432c"/><circle cx="64" cy="59" r="3" fill="#54432c"/>
-    <path d="M47 69q6 7 12 0" fill="none" stroke="#54432c" stroke-width="2.5" stroke-linecap="round"/>
-    <g fill="#d67e2f"><circle cx="29" cy="73" r="1.5"/><circle cx="34" cy="80" r="1.5"/><circle cx="74" cy="72" r="1.5"/></g>
-  </symbol>
-  <symbol id="melon" viewBox="0 0 100 100">
-    <path d="M6 25H94C91 112 9 112 6 25" fill="#3e7955"/><path d="M12 25H88C84 98 16 98 12 25" fill="#d4dd91"/>
-    <path d="M18 25H82C79 85 21 85 18 25" fill="#e66a63"/>
-    <g fill="#543d39"><ellipse cx="30" cy="38" rx="2" ry="4" transform="rotate(-25 30 38)"/><ellipse cx="50" cy="35" rx="2" ry="4"/><ellipse cx="70" cy="38" rx="2" ry="4" transform="rotate(25 70 38)"/><circle cx="39" cy="52" r="2.7"/><circle cx="61" cy="52" r="2.7"/></g>
-    <path d="M45 61q5 6 10 0" fill="none" stroke="#543d39" stroke-width="2.5" stroke-linecap="round"/>
-  </symbol>
+<symbol id="i-paw" viewBox="0 0 32 32"><g fill="currentColor"><ellipse cx="7" cy="12" rx="4" ry="5" transform="rotate(-24 7 12)"/><ellipse cx="14" cy="7" rx="3.6" ry="5"/><ellipse cx="22" cy="8" rx="3.6" ry="5" transform="rotate(18 22 8)"/><ellipse cx="28" cy="15" rx="3.3" ry="4.6" transform="rotate(30 28 15)"/><path d="M7 24c0-5 6-11 10-11s10 7 10 11c0 6-6 3-10 3S7 30 7 24Z"/></g></symbol>
+<symbol id="i-coin" viewBox="0 0 32 32"><ellipse cx="17" cy="17" rx="11.5" ry="13" fill="#d59a36" stroke="#744426" stroke-width="2"/><ellipse cx="14" cy="15" rx="11.5" ry="13" fill="#ffcf62" stroke="#744426" stroke-width="2"/><ellipse cx="14" cy="15" rx="7.8" ry="9" fill="none" stroke="#e7aa42" stroke-width="2"/><path d="M13 10v10m-3-7 3-3 3 1" fill="none" stroke="#9b622e" stroke-width="2.6" stroke-linecap="round"/><path d="M7 8 9 6" stroke="#fff6cd" stroke-width="2.5" stroke-linecap="round"/></symbol>
+<symbol id="i-fish" viewBox="0 0 64 40"><g stroke="#694329" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m18 16-12-9 2 13-3 12 14-9" fill="#cf9250"/><path d="m29 11 5-8 9 9" fill="#dca45e"/><path d="M16 20C24 3 49 4 60 19 49 36 25 37 16 20Z" fill="#e5b16a"/><path d="m28 14 5 11m5-13 5 12m7-11c-5 4-5 9-1 13" fill="none" stroke="#ad753e"/><circle cx="52" cy="17" r="1.7" fill="#694329" stroke="none"/><path d="M24 26q14 6 25-1" fill="none" stroke="#f9d99a" stroke-width="2"/></g></symbol>
+<symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-chevron" viewBox="0 0 20 20"><path d="m5 7 5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M17 8q4 4 0 8m3-11q7 7 0 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M19 9a7.5 7.5 0 1 0 1 7M19 3v6h-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="m12 2 2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5Z" fill="currentColor"/></symbol>
+<symbol id="cherry" viewBox="0 0 100 100"><g stroke="#47251c" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M29 56q14-29 29-37 0 18 15 39" fill="none"/><path d="M57 20Q78 1 88 18 76 33 57 20Z" fill="#3f943d"/><ellipse cx="29" cy="66" rx="20" ry="25" fill="#fb453f" transform="rotate(18 29 66)"/><ellipse cx="72" cy="69" rx="21" ry="25" fill="#f23b35" transform="rotate(-10 72 69)"/></g><ellipse cx="23" cy="56" rx="5" ry="7" fill="#fff4da"/><ellipse cx="66" cy="59" rx="5" ry="7" fill="#fff4da"/></symbol>
+<symbol id="orange" viewBox="0 0 100 100"><path d="M62 28Q72 7 88 19 90 36 70 37" fill="#438f36" stroke="#47251c" stroke-width="6"/><path d="M24 76C4 47 37 14 63 25 91 36 75 77 43 86L33 94 23 90Z" fill="#ffd34b" stroke="#47251c" stroke-width="6" stroke-linejoin="round"/><ellipse cx="34" cy="44" rx="6" ry="9" transform="rotate(26 34 44)" fill="#fff9c5"/></symbol>
+<symbol id="melon" viewBox="0 0 100 100"><path d="m10 18 82 8C91 103 9 98 10 18Z" fill="#27863f" stroke="#47251c" stroke-width="6" stroke-linejoin="round"/><path d="m18 25 66 7C81 86 20 80 18 25Z" fill="#ff493c"/><g fill="#47251c"><ellipse cx="31" cy="39" rx="3.5" ry="5" transform="rotate(24 31 39)"/><ellipse cx="64" cy="43" rx="3.5" ry="5"/><ellipse cx="47" cy="58" rx="3.5" ry="5"/><ellipse cx="30" cy="55" rx="3" ry="4"/></g></symbol>
 </defs></svg>
 <main class="game">
-<nav class="topline"><a class="home-link" href="../" target="_top">Yujie Liu <span>/ LITTLE EXPERIMENTS</span></a><a href="fruit-bandits.html">对比第一版 ↗</a></nav>
-<header class="intro"><div><p class="eyebrow">PULL. WATCH. PICK AGAIN.</p><h1>Fruit Bandits<span>三连水果机</span></h1><p class="subtitle">三颗一样，就有好事发生。你的下一枚，会投给谁？</p></div><div class="rule-ticket"><span>WINNING COMBINATION</span><div><svg><use href="#cherry"/></svg><svg><use href="#cherry"/></svg><svg><use href="#cherry"/></svg><b>中奖</b></div><small>三颗一样即中奖</small></div></header>
-<section class="dashboard" aria-label="本局中奖次数"><div class="win-count"><span>本局中奖</span><strong id="win-count">0</strong><small>次</small></div><div class="budget"><span class="coin-symbol">●</span><strong id="coins">100</strong><span>枚硬币剩余</span><div class="progress"><i id="progress"></i></div></div><div class="settings"><button id="sound" aria-pressed="false">♪ 音效关</button><label><input id="fast" type="checkbox" checked>快节奏</label></div></section>
-<div class="play-note"><span id="status" role="status" aria-live="polite">投 1 枚试试手气，或选 ×5 在同一台连续投 5 枚。</span><span class="keys">快捷键 1 / 2 / 3</span></div>
-<section class="machines" id="machines" aria-label="三台水果老虎机"></section>
+<nav class="topline" aria-label="游戏导航"><div class="brand"><span class="brand-paw"><svg><use href="#i-paw"/></svg></span><span>猫咪水果机<small>FRUIT BANDITS</small></span></div><div class="top-actions"><button id="sound" class="quiet-button" aria-pressed="false"><svg><use href="#i-sound"/></svg><span>音效关</span></button><button id="help" class="quiet-button"><span class="question-mark">?</span><span>怎么玩</span></button><a class="back-link" id="back" href="../research/" target="_top">返回主页 <span aria-hidden="true">↗</span></a></div></nav>
+<header class="intro"><div class="intro-copy"><p class="eyebrow"><span></span>LITTLE COINS, HAPPY CATS</p><h1>把好运，<span>喂给小猫。</span></h1><p class="subtitle">三颗水果一样，就有一条小鱼干。<br class="mobile-break">100 枚硬币，下一枚投给谁？</p></div><section class="dashboard" aria-label="本局硬币与小鱼干"><div class="counter coin-counter"><svg class="counter-icon"><use href="#i-coin"/></svg><div><span class="counter-label">剩余硬币</span><div class="counter-number"><strong id="coins">100</strong><small>/ 100</small></div></div></div><div class="counter fish-counter"><svg class="counter-icon"><use href="#i-fish"/></svg><div><span class="counter-label">收获小鱼干</span><div class="counter-number"><strong id="win-count">0</strong><small>条</small></div></div></div><div class="progress" aria-hidden="true"><i id="progress"></i></div></section></header>
+<section class="arcade" aria-label="猫咪游乐屋"><div class="arcade-top"><div class="play-note"><span class="status-dot" aria-hidden="true"></span><span id="status" role="status" aria-live="polite">小猫正在准备水果机……</span></div><label class="speed-switch"><input id="fast" type="checkbox" checked><span class="switch-track" aria-hidden="true"></span>快节奏</label></div><div class="machines" id="machines" aria-label="三台水果老虎机"></div><div class="arcade-bottom"><span><svg><use href="#i-paw"/></svg>每台都有自己的小秘密，试试再决定。</span><span class="keys">也可以按键盘 <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></span></div></section>
 <section class="result" id="result" hidden tabindex="-1" aria-label="本局结算"></section>
-<footer><span>一点运气，一点观察，一百次选择。</span><button id="restart">换一局 ↗</button></footer>
+<footer><span>一点运气，一点观察，一百次选择。</span><button id="restart" class="restart-button"><svg><use href="#i-refresh"/></svg>重新开一局</button></footer>
 </main>
-<dialog id="restart-dialog" aria-labelledby="restart-title"><h2 id="restart-title">重新开始这一局？</h2><p>当前记录将清空，三台机器的概率会重新打乱，你会获得新的 100 枚硬币。</p><div><button id="cancel-restart" class="secondary">继续玩</button><button id="confirm-restart" class="primary">重新开始</button></div></dialog>
-<noscript>请启用 JavaScript 体验三连水果机。</noscript>
+<dialog id="help-dialog" aria-labelledby="help-title" class="paper-dialog"><button class="dialog-close" data-close="help-dialog" aria-label="关闭玩法">×</button><div class="dialog-mark"><svg><use href="#i-paw"/></svg></div><p class="eyebrow">WELCOME TO THE LITTLE ARCADE</p><h2 id="help-title">陪小橘，攒一碗小鱼干。</h2><ol class="help-steps"><li><b>挑一台，投 1 枚。</b><span>你有 100 枚硬币。点击机器、投币按钮，或按 1 / 2 / 3。</span></li><li><b>三颗一样，小鱼干 +1。</b><span>樱桃、柠檬、西瓜都一样：三连就赢。×5 会在同一台连续投 5 枚。</span></li><li><b>观察结果，选择下一台。</b><span>三台机器的中奖率各不相同，一局内保持不变。展开「开奖记录」看看自己的观察。</span></li></ol><p class="help-note">100 枚用完后，揭晓每台机器的真实中奖率，也看看 UCB 策略的平均表现。</p><button class="primary full-width" data-close="help-dialog">知道啦，开玩 <svg><use href="#i-arrow"/></svg></button></dialog>
+<dialog id="restart-dialog" aria-labelledby="restart-title" class="paper-dialog"><div class="dialog-mark"><svg><use href="#i-refresh"/></svg></div><h2 id="restart-title">给小猫换一局？</h2><p>这一局的记录会清空，三台机器重新打乱，你会拿到新的 100 枚硬币。</p><div class="dialog-actions"><button id="cancel-restart" class="secondary">接着玩</button><button id="confirm-restart" class="primary">重新开始</button></div></dialog>
+<noscript><p class="noscript">请启用 JavaScript，再来陪小猫玩水果机。</p></noscript>
 </body></html>

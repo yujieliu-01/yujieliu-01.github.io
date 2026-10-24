@@ -26,8 +26,8 @@
   });
   const dialog = document.querySelector('#game-dialog');
   const container = document.querySelector('.game-frame-container');
-  const titles = {fruit: 'Fruit for Thought · 水果运筹学', canteen: 'Panda Night Stall · 熊猫夜宵摊', bandits: 'Fruit Bandits · 第一版', triple: 'Fruit Bandits · 三连水果机'};
-  const paths = {fruit: 'games/fruit.html', canteen: 'games/panda-night-stall/', bandits: 'games/fruit-bandits.html', triple: 'games/fruit-bandits-triple.html'};
+  const titles = {fruit: 'Fruit for Thought · 水果运筹学', canteen: 'Panda Night Stall · 熊猫夜宵摊', bandits: 'Fruit Bandits · 第一版', triple: 'Fruit Bandits · 猫咪水果机'};
+  const paths = {fruit: 'games/fruit.html', canteen: 'games/panda-night-stall/', bandits: 'games/fruit-bandits.html', triple: 'games/fruit-bandits-triple.html?v=20261025-cat-arcade'};
   let trigger = null;
   let frame = null;
   let closing = false;

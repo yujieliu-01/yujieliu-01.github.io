@@ -24,7 +24,9 @@ The white, gray, and cyan visual design and shared author sidebar follow https:/
 
 The animated cat beside the LinUCB paper on the Research page opens the three-reel game (`games/fruit-bandits-triple.html`). The sidebar on all three academic pages is reserved for profile and contact information. Fruit for Thought and Fruit Bandits Classic remain available at their existing game URLs.
 
-The three-reel game uses a 100-coin budget and shuffled 40% / 50% / 60% probabilities. Its UCB comparison is calibrated with `node games/bandits-triple/calibrate-ucb.cjs`; the JSON file records training and independent validation results. Run `node games/bandits-triple/engine.test.cjs` and `node games/bandits-triple/ucb.test.cjs` to verify the game and benchmark. Use `node games/bandits-triple/build-preview.cjs` to rebuild the separate offline preview.
+The three-reel game is a warm, illustrated cat arcade using the same orange cat, coral-red cabinet, fruit symbols, lever and fish-eating animation as its paper icon. The three canvases share the original artwork preparation, but each retains its own actual reel outcomes. A matching triple earns one dried fish (one win). The interface shows the 100-coin budget and total fish; each machine has its own counts and expandable recent history. Single spins, five-spin batches, 1/2/3 shortcuts, optional sound and reduced-motion rendering are supported. Escape closes an open help/restart dialog first, then returns from the embedded game to the paper page.
+
+The rules remain a 100-coin budget and shuffled 40% / 50% / 60% probabilities, hidden until the round ends. Its UCB comparison is calibrated with `node games/bandits-triple/calibrate-ucb.cjs`; the JSON file records training and independent validation results. Run `node games/bandits-triple/engine.test.cjs`, `node games/bandits-triple/ucb.test.cjs` and `node games/bandits-triple/renderer.test.cjs` to verify the game, benchmark and artwork synchronization. Use `node games/bandits-triple/build-preview.cjs` to rebuild a self-contained offline HTML preview, including all image and animation assets. The online game has no new external dependency.
 
 ## Panda Night Stall
 
