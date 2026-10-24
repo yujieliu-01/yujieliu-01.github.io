@@ -299,6 +299,11 @@ function bindControls() {
   document.addEventListener('fullscreenchange',resize);
   document.addEventListener('keydown',event=>{
     if(['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)||document.querySelector('dialog[open]')||event.repeat||event.ctrlKey||event.metaKey||event.altKey)return;
+    if(event.key==='Escape'&&window.parent!==window&&!document.fullscreenElement){
+      event.preventDefault();
+      window.parent.postMessage({type:'homepage:close'},location.origin);
+      return;
+    }
     if(['1','2','3'].includes(event.key)){event.preventDefault();session.choose(['cat','mix','dog'][Number(event.key)-1]);updateUI();}
     if(event.code==='Space'){event.preventDefault();toggleGame();}
   });

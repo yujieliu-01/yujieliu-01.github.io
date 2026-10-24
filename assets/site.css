@@ -171,3 +171,7 @@ dialog.wide-game{width:min(1120px,calc(100% - 48px))}
 .paper-title-game { display: flex; align-items: center; gap: 8px; }
 .paper-title-game > a { min-width: 0; }
 .paper-title-game .paper-game { flex: 0 0 64px; margin: -5px 0; }
+
+/* Give the night-stall vignette room for one guest beside the panda. */
+.paper-title-game .panda-paper-game { flex-basis: 80px; width: 80px; overflow: hidden; background: #213839; }
+.panda-paper-game picture, .panda-paper-game img { width: 80px; height: 64px; border-radius: inherit; }

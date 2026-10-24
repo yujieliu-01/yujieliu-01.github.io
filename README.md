@@ -10,7 +10,7 @@ A small, build-free website served by GitHub Pages from `main` at the repository
 - `research/index.html`: research interests, papers, and work in progress.
 - `background/index.html`: appointments and education.
 - `assets/site.css`: responsive layout and visual design.
-- `assets/site.js`: mobile contact menu, compatibility with old section links, and the four on-demand games.
+- `assets/site.js`: mobile contact menu, compatibility with old section links, and on-demand game dialogs.
 - `games/`: self-contained games. No game is loaded until its small icon is selected.
 - `assets/`: portrait and public documents.
 
@@ -22,10 +22,16 @@ The white, gray, and cyan visual design and shared author sidebar follow https:/
 
 ## Fruit Bandits
 
-The sidebar on all three academic pages retains Fruit for Thought and Monster Canteen, and adds separate entries for Fruit Bandits Classic (`games/fruit-bandits.html`) and the three-reel version (`games/fruit-bandits-triple.html`). The latter uses the homepage white / slate / cyan palette; the classic version retains its original design.
+The animated cat beside the LinUCB paper on the Research page opens the three-reel game (`games/fruit-bandits-triple.html`). The sidebar on all three academic pages is reserved for profile and contact information. Fruit for Thought and Fruit Bandits Classic remain available at their existing game URLs.
 
 The three-reel game uses a 100-coin budget and shuffled 40% / 50% / 60% probabilities. Its UCB comparison is calibrated with `node games/bandits-triple/calibrate-ucb.cjs`; the JSON file records training and independent validation results. Run `node games/bandits-triple/engine.test.cjs` and `node games/bandits-triple/ucb.test.cjs` to verify the game and benchmark. Use `node games/bandits-triple/build-preview.cjs` to rebuild the separate offline preview.
 
 ## Panda Night Stall
 
-The queueing-game button on all three academic pages opens `games/panda-night-stall/` in a wide dialog. It uses the reviewed v2 artwork and continuous FIFO animation, with a 60-second round, 2.5-second batches, a backlog chart, and matched-traffic strategy comparisons. The old `games/canteen.html` remains available at its existing URL. Run `npm test --prefix games/panda-night-stall` for layout, rules, and motion regression checks. Closing the homepage dialog pauses and unloads the game.
+The animated panda night-stall icon beside the finite-time queueing paper on the Research page opens `games/panda-night-stall/` in a wide dialog. The icon uses the approved night-scene artwork: one orange cat collects a can and leaves, then one corgi collects bone soup and leaves. A static representative frame is used when the visitor prefers reduced motion.
+
+The game uses the reviewed v2 artwork and continuous FIFO animation, with a 60-second round, 2.5-second batches, a backlog chart, and matched-traffic strategy comparisons. The old `games/canteen.html` remains available at its existing URL. Run `npm test --prefix games/panda-night-stall` for layout, rules, and motion regression checks. Closing the homepage dialog pauses and unloads the game.
+
+The paper icon is a pre-rendered 320×256 WebP displayed at 80×64, with an approximately 11.6-second loop. It adds no animation script to the academic page. To regenerate it from the scene layers, run `node tools/render-panda-icon.cjs`; this optional artwork tool needs `@napi-rs/canvas`, `sharp`, and FFmpeg with `libwebp_anim`. The tool writes the animated image, reduced-motion still, and a contact sheet to `assets/`; only the two WebP files are used by the page. These tools are not needed to serve the website.
+
+Inside the embedded panda game, Escape returns to the paper page; when the game's own help or results dialog is open, Escape closes that dialog first.
