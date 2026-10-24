@@ -14,6 +14,7 @@
   --rice:light-dark(#fffef2,#fff5d6);--seaweed:light-dark(#334d3c,#345640);--bean:light-dark(#ffc65d,#ffd27d);
   --mouth:#292633;--eye:#fff8e0;--tongue:#ef7f8b;--crumb:light-dark(#d69b48,#e7b862);--on-button:light-dark(#fffdf1,#18241c);
   --sweat:light-dark(#65a6d1,#93c6e9);
+  --cold:light-dark(#397a9c,#89c9e4);--cold-light:light-dark(#d9edf1,#354c59);--cold-food:light-dark(#aacbd5,#a1c6d5);
   box-sizing:border-box;position:relative;max-width:736px;margin:auto;padding:25px 28px 24px;overflow:hidden;
   background:var(--paper);color:var(--ink);font:14px/1.55 Arial,"Microsoft YaHei",sans-serif;
 }
@@ -22,6 +23,11 @@
 #monster-canteen .brand{margin:0 96px 7px 0;font:11px/1.5 "Courier New",monospace;letter-spacing:.15em;color:var(--muted);}
 #monster-canteen h2{font:600 29px/1.3 Arial,"Microsoft YaHei",sans-serif;letter-spacing:.02em;margin:0;color:var(--ink);}
 #monster-canteen .tagline{font-size:12px;color:var(--muted);margin:7px 0 17px;}
+#monster-canteen .shift-label{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 10px;margin:0 0 10px;background:var(--soft);font-size:11px;}
+#monster-canteen .shift-label strong{color:var(--green-dark);}
+#monster-canteen .shift-label[data-rush="true"]{background:var(--warm);}
+#monster-canteen .shift-label[data-rush="true"] strong{color:var(--danger);}
+#monster-canteen .result-goal{font-size:12px;font-weight:600;color:var(--green-dark);margin:0 0 13px;}
 #monster-canteen .hud{display:flex;align-items:center;gap:16px;border-top:2px solid var(--line);padding-top:12px;}
 #monster-canteen .hud-stat{display:flex;align-items:baseline;gap:6px;font-size:12px;white-space:nowrap;color:var(--muted);}
 #monster-canteen .hud-stat strong{font:600 24px/1 "Courier New",monospace;color:var(--ink);}
@@ -31,16 +37,47 @@
 #monster-canteen .pause-button:disabled{opacity:.5;}
 #monster-canteen .time-track{height:5px;background:var(--line);margin-top:11px;overflow:hidden;}
 #monster-canteen .time-fill{height:100%;width:100%;background:var(--green);}
-#monster-canteen .dispatch{display:flex;align-items:center;gap:12px;min-height:84px;margin:7px 0 5px;}
-#monster-canteen .next-art{width:60px;height:60px;flex:0 0 60px;image-rendering:pixelated;}
-#monster-canteen .next-copy{min-width:0;}
-#monster-canteen .small-label{font-size:11px;color:var(--muted);}
-#monster-canteen .next-title{font-size:19px;line-height:1.35;font-weight:600;margin:1px 0 2px;}
-#monster-canteen .pending-copy{font-size:11px;color:var(--muted);}
-#monster-canteen .next-copy .urgent{color:var(--danger);font-weight:600;}
-#monster-canteen .patience{width:98px;max-width:100%;height:4px;background:var(--line);margin-top:6px;}
-#monster-canteen .patience-fill{height:100%;background:var(--yellow);width:100%;}
-#monster-canteen .dispatch-hint{margin-left:auto;max-width:190px;text-align:right;font-size:12px;color:var(--muted);}
+#monster-canteen .dispatch{margin:13px 0 9px;position:relative;}
+#monster-canteen .dispatch-heading{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11px;color:var(--muted);margin-bottom:7px;}
+#monster-canteen .dispatch-heading strong{font-size:13px;color:var(--ink);}
+#monster-canteen .food-line{position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;padding:0;margin:0;list-style:none;}
+#monster-canteen .food-ticket{position:relative;min-width:0;background:var(--soft);padding:6px 7px 7px;text-align:center;border-bottom:3px solid var(--line);transition:background .2s;}
+#monster-canteen .food-ticket[data-front="true"]{background:var(--warm);border-bottom-color:var(--green-dark);}
+#monster-canteen .food-ticket[data-status="urgent"]{background:#ffe0c7;border-bottom-color:var(--danger);}
+#monster-canteen .food-ticket[data-status="upcoming"]{background:transparent;border-bottom-style:dashed;}
+#monster-canteen .food-ticket[data-status="empty"]{background:transparent;color:var(--muted);}
+#monster-canteen .ticket-label{display:block;font-size:11px;line-height:1.4;white-space:nowrap;color:var(--muted);}
+#monster-canteen .food-ticket[data-front="true"] .ticket-label{font-weight:600;color:var(--green-dark);}
+#monster-canteen .food-ticket[data-status="urgent"] .ticket-label{color:var(--danger);}
+#monster-canteen .ticket-art{display:block;width:100%;height:43px;image-rendering:pixelated;}
+#monster-canteen .food-ticket[data-status="upcoming"] .ticket-art{opacity:.5;}
+#monster-canteen .heat-track{height:4px;background:var(--line);overflow:hidden;margin:2px 0 5px;}
+#monster-canteen .heat-fill{height:100%;background:var(--green);transform-origin:left;}
+#monster-canteen .food-ticket[data-status="warm"] .heat-fill{background:#c88b2d;}
+#monster-canteen .food-ticket[data-status="urgent"] .heat-fill{background:var(--danger);}
+#monster-canteen .ticket-time{display:block;font:11px/1.3 "Courier New","Microsoft YaHei",monospace;white-space:nowrap;}
+#monster-canteen .food-ticket[data-status="urgent"] .ticket-time{color:var(--danger);font-weight:600;}
+#monster-canteen .food-ticket[data-status="upcoming"] .heat-track,#monster-canteen .food-ticket[data-status="empty"] .heat-track{visibility:hidden;}
+#monster-canteen .dispatch-key{font-size:10px;color:var(--muted);margin:5px 0 0;}
+#monster-canteen .discard-row{display:flex;align-items:center;gap:8px;min-height:43px;margin:3px 0 0;border-bottom:1px solid var(--line);}
+#monster-canteen .discard-label{font-size:11px;white-space:nowrap;color:var(--muted);}
+#monster-canteen .discard-tray{width:108px;height:38px;image-rendering:pixelated;flex:0 0 108px;}
+#monster-canteen .loss-caption{font-size:12px;color:var(--muted);margin:0;line-height:1.45;min-width:0;}
+#monster-canteen .loss-caption[data-kind="cold"]{color:var(--cold);font-weight:600;}
+#monster-canteen .loss-caption[data-kind="counter"]{color:var(--danger);font-weight:600;}
+#monster-canteen .loss-layer{position:absolute;inset:25px 0 0;z-index:6;pointer-events:none;}
+#monster-canteen .lost-food{position:absolute;left:0;top:0;width:68px;display:grid;justify-items:center;color:var(--cold);font-size:12px;font-weight:600;animation:canteen-cold-drop 1.45s ease-in forwards;}
+#monster-canteen .lost-food canvas{width:54px;height:54px;image-rendering:pixelated;}
+#monster-canteen .lost-food span{background:var(--cold-light);padding:3px 7px;white-space:nowrap;}
+#monster-canteen .lost-food[data-kind="counter"]{color:var(--danger);}
+#monster-canteen .lost-food[data-kind="counter"] span{background:var(--warm);}
+#monster-canteen .discard-row[data-kind="counter"]{--loss-color:var(--warm);}
+#monster-canteen .cold-flash{animation:canteen-cold-flash .8s ease-out;}
+#monster-canteen .lost-counter{animation:canteen-counter-pop .65s ease-out;}
+#monster-canteen .canteen[data-game-paused="true"] .lost-food{animation-play-state:paused;}
+@keyframes canteen-cold-drop{0%{transform:translate(0,0) rotate(-7deg);opacity:1}25%{transform:translate(0,-8px) rotate(8deg);opacity:1}65%{transform:translate(50px,67px) rotate(14deg);opacity:1}100%{transform:translate(70px,90px) rotate(20deg) scale(.6);opacity:0}}
+@keyframes canteen-cold-flash{0%,35%{background:var(--loss-color,var(--cold-light))}100%{background:transparent}}
+@keyframes canteen-counter-pop{35%{color:var(--loss-color,var(--cold));transform:scale(1.4)}100%{transform:scale(1)}}
 #monster-canteen .notice{min-height:27px;margin:0 0 8px;font-size:12px;font-weight:500;color:var(--green-dark);}
 #monster-canteen .notice[data-tone="warning"]{color:var(--danger);}
 #monster-canteen .stage{position:relative;}
@@ -51,14 +88,14 @@
 #monster-canteen .lane-heading strong{font-size:17px;color:var(--accent-dark);}
 #monster-canteen .lane-heading .queue-label{font-size:11px;color:var(--muted);}
 #monster-canteen .lane-pref{font-size:11px;color:var(--muted);margin:0 0 2px;}
-#monster-canteen .queue-scene{display:block;width:100%;height:270px;image-rendering:pixelated;}
+#monster-canteen .queue-scene{display:block;width:100%;height:230px;image-rendering:pixelated;}
 #monster-canteen .workload{display:flex;align-items:center;gap:7px;min-height:23px;font-size:11px;color:var(--muted);}
 #monster-canteen .queue-meter{display:flex;gap:3px;flex:1;}
 #monster-canteen .queue-meter span{height:5px;flex:1;background:var(--line);}
 #monster-canteen .queue-meter span.on{background:var(--accent);}
 #monster-canteen .lane[data-pressure="high"] .queue-meter span.on{background:var(--danger);}
 #monster-canteen .lane[data-pressure="high"] .queue-label{color:var(--danger);font-weight:600;}
-#monster-canteen .route-button{display:block;width:100%;min-height:46px;background:var(--accent);border:0;border-bottom:4px solid var(--accent-dark);color:var(--on-button);font-size:14px;font-weight:600;margin-top:7px;padding:9px 5px;}
+#monster-canteen .route-button{display:block;width:100%;min-height:46px;background:var(--accent);border:0;border-bottom:4px solid var(--accent-dark);color:var(--on-button);font-size:14px;font-weight:600;margin:7px 0;padding:9px 5px;}
 #monster-canteen .route-button:hover:not(:disabled){filter:brightness(1.08);}
 #monster-canteen .route-button:active:not(:disabled){translate:0 2px;border-bottom-width:2px;}
 #monster-canteen .route-button:disabled,#monster-canteen .route-button[aria-disabled="true"]{opacity:.48;cursor:default;}
@@ -97,8 +134,13 @@
   #monster-canteen .lane-heading strong{font-size:16px;}
   #monster-canteen .lane-pref{font-size:11px;min-height:34px;}
   #monster-canteen .dispatch{gap:8px;}
-  #monster-canteen .dispatch-hint{font-size:11px;max-width:84px;}
-  #monster-canteen .next-title{font-size:18px;}
+  #monster-canteen .food-line{gap:5px;}
+  #monster-canteen .food-ticket{padding:5px 4px 6px;}
+  #monster-canteen .dispatch-heading{font-size:10px;}
+  #monster-canteen .dispatch-heading strong{font-size:12px;}
+  #monster-canteen .discard-row{gap:5px;}
+  #monster-canteen .discard-tray{width:80px;flex-basis:80px;}
+  #monster-canteen .loss-caption{font-size:11px;}
   #monster-canteen .notice{font-size:11px;min-height:34px;}
   #monster-canteen .route-button{font-size:12px;}
   #monster-canteen .overlay{padding:7px;}
@@ -110,47 +152,66 @@
   #monster-canteen .result-number{font-size:44px;}
   #monster-canteen .results h3{font-size:24px;}
 }
+@media(max-height:760px){
+  #monster-canteen .canteen{padding-top:14px;padding-bottom:14px;}
+  #monster-canteen .brand{margin-bottom:3px;}
+  #monster-canteen .tagline{margin:4px 0 10px;}
+  #monster-canteen .queue-scene{height:205px;}
+  #monster-canteen .game-footer{margin-top:8px;padding-top:8px;}
+}
+@media(prefers-reduced-motion:reduce){#monster-canteen .lost-food{animation:none!important;top:8px;}#monster-canteen .lost-food canvas{display:none;}}
 </style>
 <div id="monster-canteen" >
   <div class="canteen" aria-label="小怪兽食堂排队游戏">
-    <header><p class="brand">MONSTER CANTEEN</p><h2>小怪兽食堂</h2><p class="tagline">两张嘴，一波高峰。让排队的食物都进肚子里。</p></header>
-    <div class="hud"><span class="hud-stat timer">剩余 <strong data-time>35</strong> 秒</span><span class="hud-stat">吃掉 <strong data-fed>0</strong></span><span class="hud-stat">凉掉 <strong data-lost>0</strong></span><button type="button" class="pause-button cursor-interaction" data-pause disabled>暂停</button></div>
+    <header><p class="brand">MONSTER CANTEEN</p><h2>小怪兽食堂</h2><p class="tagline">一批接一批，别只看口味。下一份，也要有地方排。</p></header>
+    <div class="shift-label" data-rush="false"><strong data-shift>午高峰 · 准备开饭</strong><span data-goal>目标 39 / 45 份</span></div>
+    <div class="hud"><span class="hud-stat timer">剩余 <strong data-time>35</strong> 秒</span><span class="hud-stat">吃掉 <strong data-fed>0</strong></span><span class="hud-stat">凉 / 挤掉 <strong data-lost>0</strong></span><button type="button" class="pause-button cursor-interaction" data-pause disabled>暂停</button></div>
     <div class="time-track" role="progressbar" aria-label="本局剩余时间" aria-valuemin="0" aria-valuemax="35" aria-valuenow="35"><div class="time-fill"></div></div>
     <div class="game-view">
-      <div class="dispatch"><canvas class="next-art" width="120" height="120" role="img" aria-label="下一份食物"></canvas><div class="next-copy"><div class="small-label">下一份</div><div class="next-title" data-next-title>等开饭</div><div class="pending-copy" data-pending>食物会自动到达</div><div class="patience"><div class="patience-fill"></div></div></div><div class="dispatch-hint">点按钮分配<br>键盘 ← / →</div></div>
+      <div class="dispatch">
+        <div class="dispatch-heading"><strong>先分配最左边 ↓</strong><span data-pending>待分配 0 / 5 份</span></div>
+        <ol class="food-line" aria-label="待分配食物队列，从左到右分配"></ol>
+        <p class="dispatch-key">实色：已到，热度递减 · 浅色：即将到达，还不计时</p>
+        <div class="discard-row"><span class="discard-label">退餐盘</span><canvas class="discard-tray" role="img" aria-label="退餐盘暂时空着"></canvas><p class="loss-caption" data-kind="none">别让热乎的食物等凉。</p></div>
+        <div class="loss-layer" aria-hidden="true"></div>
+      </div>
       <p class="notice" data-tone="normal" role="status" aria-live="polite" aria-atomic="true">看一眼队伍，再决定送给谁。</p>
       <div class="stage">
         <div class="lanes">
-          <section class="lane" data-lane="0" aria-label="青团队列"><div class="lane-heading"><strong>青团</strong><span class="queue-label">空肚子</span></div><p class="lane-pref">豆子吃得快 · 饭团慢慢嚼</p><canvas class="queue-scene" role="img" aria-label="青团等待开饭"></canvas><div class="workload"><div class="queue-meter" aria-hidden="true"></div><span class="work-time">0.0 秒</span></div><button type="button" class="route-button cursor-interaction" data-route="0" disabled>← 送给青团</button></section>
-          <section class="lane purple" data-lane="1" aria-label="紫芋队列"><div class="lane-heading"><strong>紫芋</strong><span class="queue-label">空肚子</span></div><p class="lane-pref">饭团吃得快 · 豆子慢慢嚼</p><canvas class="queue-scene" role="img" aria-label="紫芋等待开饭"></canvas><div class="workload"><div class="queue-meter" aria-hidden="true"></div><span class="work-time">0.0 秒</span></div><button type="button" class="route-button cursor-interaction" data-route="1" disabled>送给紫芋 →</button></section>
+          <section class="lane" data-lane="0" aria-label="青团队列"><div class="lane-heading"><strong>青团</strong><span class="queue-label">空肚子</span></div><p class="lane-pref">豆子吃得快 · 饭团慢慢嚼</p><button type="button" class="route-button cursor-interaction" data-route="0" disabled>← 送给青团</button><canvas class="queue-scene" role="img" aria-label="青团等待开饭"></canvas><div class="workload"><div class="queue-meter" aria-hidden="true"></div><span class="work-time">0.0 秒</span></div></section>
+          <section class="lane purple" data-lane="1" aria-label="紫芋队列"><div class="lane-heading"><strong>紫芋</strong><span class="queue-label">空肚子</span></div><p class="lane-pref">饭团吃得快 · 豆子慢慢嚼</p><button type="button" class="route-button cursor-interaction" data-route="1" disabled>送给紫芋 →</button><canvas class="queue-scene" role="img" aria-label="紫芋等待开饭"></canvas><div class="workload"><div class="queue-meter" aria-hidden="true"></div><span class="work-time">0.0 秒</span></div></section>
         </div>
-        <div class="overlay" data-intro><div class="overlay-inner"><h3>肚子已经准备好了。</h3><p>豆子给青团，饭团给紫芋。<br>两只都能吃所有食物，<br><strong>队伍太长，就换一只帮忙！</strong></p><button type="button" class="main-button cursor-interaction" data-start>开饭 · 35 秒</button></div></div>
+        <div class="overlay" data-intro><div class="overlay-inner"><h3>这次，来客不讲武德。</h3><p>豆子给青团快，饭团给紫芋快。<br>高峰会<strong>一口气来 3 份</strong>，还会连着同一种。<br>看后面的来单，提前给另一只分流。<br><strong>吃掉 85% 过关，解锁「爆单」！</strong></p><button type="button" class="main-button cursor-interaction" data-start>迎战午高峰 · 35 秒</button></div></div>
         <div class="overlay" data-paused hidden><div class="overlay-inner"><h3>先喘口气。</h3><p>时间和队伍都已暂停。</p><button type="button" class="main-button cursor-interaction" data-resume>继续开饭</button></div></div>
       </div>
-      <p class="game-footer">每队最多 6 份（含正在吃的）。待分配食物放太久会凉掉；最后 5 秒停止来单，抓紧清台。</p>
+      <p class="game-footer">点击按钮或用 ← / → 分配队头。食物到达后 5 秒会凉掉；发餐盘满 5 份时，新来单会挤掉最前一份。送到怪兽队列后不再变凉；每队最多 6 份。最后 5 秒停止来单。</p>
     </div>
-    <section class="results" aria-label="食堂营业结果" hidden><p class="result-kicker">SERVICE COMPLETE</p><h3 data-result-title>打烊啦！</h3><div class="result-hero"><div><div class="result-number"><span data-result-fed>0</span><small data-result-total> / 0</small></div><div class="result-label">份食物成功进肚子</div></div><canvas class="result-art" role="img" aria-label="两只吃饱的小怪兽"></canvas></div><div class="result-stats"><span>凉掉 <strong data-result-lost>0</strong> 份</span><span>未吃完 <strong data-result-left>0</strong> 份</span><span>平均等候 <strong data-result-wait>0</strong> 秒</span></div><p class="result-copy" data-result-copy></p><div class="result-actions"><button type="button" class="main-button cursor-interaction" data-retry>重玩同一波</button><button type="button" class="secondary-button cursor-interaction" data-new>换一波来客</button></div><p class="best-note" data-best></p></section>
+    <section class="results" aria-label="食堂营业结果" hidden><p class="result-kicker">SERVICE COMPLETE</p><h3 data-result-title>打烊啦！</h3><p class="result-goal" data-result-goal></p><div class="result-hero"><div><div class="result-number"><span data-result-fed>0</span><small data-result-total> / 0</small></div><div class="result-label">份食物成功进肚子</div></div><canvas class="result-art" role="img" aria-label="两只吃饱的小怪兽"></canvas></div><div class="result-stats"><span>凉 / 挤掉 <strong data-result-lost>0</strong> 份</span><span>未吃完 <strong data-result-left>0</strong> 份</span><span>平均等候 <strong data-result-wait>0</strong> 秒</span></div><p class="result-copy" data-result-copy></p><div class="result-actions"><button type="button" class="main-button cursor-interaction" data-hard hidden>挑战爆单 →</button><button type="button" class="secondary-button cursor-interaction" data-retry>重玩同一波</button><button type="button" class="secondary-button cursor-interaction" data-new>换一波来客</button><button type="button" class="secondary-button cursor-interaction" data-normal hidden>返回午高峰</button></div><p class="best-note" data-best></p></section>
   </div>
 </div>
 <script id="canteen-engine">
 (() => {
   const DURATION=35,CAPACITY=6,PATIENCE=5;
   const durations=[[.95,2.8],[2.1,1.65]];
+  const LEVELS=[{name:'午高峰',peak:16},{name:'爆单',peak:18}];
   function random(s){let x=s.rng;x^=x<<13;x^=x>>>17;x^=x<<5;s.rng=x>>>0;return s.rng/4294967296;}
-  function schedule(seed){
-    const r={rng:(seed>>>0)||192837},list=[];let t=0,i=0;
-    while(t<30){
-      let type;
-      if(t>=8&&t<14)type=random(r)<.85?1:0;
-      else if(t>=14&&t<20)type=random(r)<.85?0:1;
-      else type=random(r)<.5?0:1;
-      list.push({id:i++,born:Number(t.toFixed(5)),type});
-      const interval=t<8?1.06+random(r)*.23:t<22?.56+random(r)*.16:t<27?1.02+random(r)*.2:.61+random(r)*.14;
-      t+=interval;
-    }
+  function schedule(seed,level=0){
+    const r={rng:((seed>>>0)^0x9e3779b9)||192837},list=[];
+    for(let i=0;i<8;i++)random(r);
+    const first=random(r)<.5?0:1,peak=LEVELS[level].peak;
+    const phases=[[0,5,6,-1],[5,14,peak,first],[14,17,3,-1],[17,26,peak,1-first],[26,29.5,4,-1]];
+    phases.forEach(([start,end,count,dominant],phase)=>{
+      let done=0,batch=0;const sizeLimit=phase===1||phase===3?3:1,batches=Math.ceil(count/sizeLimit);
+      while(done<count){
+        const size=Math.min(count-done,sizeLimit),born=+(start+(end-start)*(batch+.15*random(r))/batches).toFixed(5);
+        for(let j=0;j<size;j++)list.push({id:list.length,born:list.length?born:0,type:dominant<0?(random(r)<.5?0:1):random(r)<.9?dominant:1-dominant});
+        done+=size;batch++;
+      }
+    });
     return list;
   }
-  function create(seed){return{version:1,seed:seed>>>0,time:0,schedule:schedule(seed),next:0,pending:[],lanes:[[],[]],fed:0,lost:0,waitSum:0,peak:[0,0],matched:0,assigned:0,finished:false};}
+  function create(seed,level=0){return{version:2,level,seed:seed>>>0,time:0,schedule:schedule(seed,level),next:0,pending:[],lanes:[[],[]],fed:0,lost:0,waitSum:0,peak:[0,0],matched:0,assigned:0,finished:false};}
+  function goal(s){return Math.ceil(s.schedule.length*.85);}
   function begin(job,lane,time){job.start=time;job.due=time+durations[lane][job.type];}
   function workload(s,lane){return s.lanes[lane].reduce((sum,j,i)=>sum+(i===0?Math.max(0,j.due-s.time):durations[lane][j.type]),0);}
   function route(s,lane){
@@ -187,13 +248,13 @@
   }
   function summary(s){return{fed:s.fed,total:s.schedule.length,lost:s.lost,left:s.pending.length+s.lanes[0].length+s.lanes[1].length,averageWait:s.fed?s.waitSum/s.fed:0,peak:s.peak,matched:s.matched,assigned:s.assigned};}
   function valid(s){
-    if(!s||s.version!==1||!Number.isInteger(s.seed)||!Number.isFinite(s.time)||s.time<0||s.time>DURATION||!Array.isArray(s.schedule)||!Array.isArray(s.pending)||!Array.isArray(s.lanes)||s.lanes.length!==2)return false;
+    if(!s||s.version!==2||![0,1].includes(s.level)||!Number.isInteger(s.seed)||!Number.isFinite(s.time)||s.time<0||s.time>DURATION||!Array.isArray(s.schedule)||!Array.isArray(s.pending)||!Array.isArray(s.lanes)||s.lanes.length!==2)return false;
     if(s.pending.length>5||s.lanes.some(q=>!Array.isArray(q)||q.length>CAPACITY)||!Number.isInteger(s.next)||s.next<0||s.next>s.schedule.length||!Number.isInteger(s.fed)||!Number.isInteger(s.lost)||s.fed<0||s.lost<0)return false;
     if(s.fed+s.lost+s.pending.length+s.lanes[0].length+s.lanes[1].length!==s.next)return false;
-    if(s.schedule.length!==schedule(s.seed).length||!Array.isArray(s.peak)||s.peak.length!==2)return false;
+    if(s.schedule.length!==schedule(s.seed,s.level).length||!Array.isArray(s.peak)||s.peak.length!==2)return false;
     return s.lanes.every(q=>q.every((j,i)=>Number.isInteger(j.id)&&(j.type===0||j.type===1)&&Number.isFinite(j.born)&&(i!==0||(Number.isFinite(j.start)&&Number.isFinite(j.due)))));
   }
-  window.MonsterCanteenEngine={DURATION,CAPACITY,PATIENCE,durations,create,schedule,route,step,summary,workload,valid};
+  window.MonsterCanteenEngine={DURATION,CAPACITY,PATIENCE,LEVELS,durations,create,schedule,goal,route,step,summary,workload,valid};
 })();
 </script>
 <script>
@@ -203,36 +264,45 @@
   const laneEls=[...root.querySelectorAll('[data-lane]')],buttons=[...root.querySelectorAll('[data-route]')];
   const canvases=laneEls.map(el=>el.querySelector('canvas'));
   const seed=()=>Math.floor(Math.random()*4294967295)||192837;
-  let state=E.create(seed()),mode='idle',best={},runId=String(Date.now()),revision=0;
-  let lastFrame=0,lastHUD=0,raf=0,noticeUntil=0,lastEat=-10,chain=0,milestone=0;
+  let state=E.create(seed()),mode='idle',best={},unlocked=false,runId=String(Date.now()),revision=0;
+  let lastFrame=0,lastHUD=0,raf=0,noticeUntil=0,lastEat=-10,chain=0;
   let colors={},sizes=[],visuals=[new Map(),new Map()],effects=[],swallows=[-10,-10],reject=[-10,-10],queueLevels=[0,0];
+  let tickets=new Map(),ticketKey='',discards=[],lossVisuals=[];
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   const stored=window.gameStorage?.snapshot?.privateContent;
-  if(E.valid(stored?.game)){state=structuredClone(stored.game);mode=state.finished?'ended':stored.mode==='idle'?'idle':'paused';best=stored.best||{};runId=stored.runId||runId;revision=stored.revision||0;}
+  if(E.valid(stored?.game)){state=structuredClone(stored.game);mode=state.finished?'ended':stored.mode==='idle'?'idle':'paused';best=stored.best||{};runId=stored.runId||runId;revision=stored.revision||0;discards=Array.isArray(stored.discards)?stored.discards.filter(d=>(d.type===0||d.type===1)&&['cold','counter'].includes(d.reason)).slice(-4):[];}
+  if(E.valid(stored?.game))unlocked=stored.unlocked===true||state.level===1;
   function text(el,value){if(el.textContent!==String(value))el.textContent=String(value);}
   laneEls.forEach(el=>{for(let i=0;i<6;i++){const s=document.createElement('span');el.querySelector('.queue-meter').append(s);}});
   function palette(){
     const style=getComputedStyle($('.canteen'));
-    ['paper','ink','muted','line','soft','floor','green','green-dark','green-light','purple','purple-dark','purple-light','yellow','danger','warm','rice','seaweed','bean','mouth','eye','tongue','crumb','sweat'].forEach(key=>{
+    ['paper','ink','muted','line','soft','floor','green','green-dark','green-light','purple','purple-dark','purple-light','yellow','danger','warm','rice','seaweed','bean','mouth','eye','tongue','crumb','sweat','cold','cold-light','cold-food'].forEach(key=>{
       const probe=document.createElement('span');probe.style.color=`var(--${key})`;probe.hidden=true;$('.canteen').append(probe);colors[key]=getComputedStyle(probe).color;probe.remove();
     });
   }
   function fit(canvas,height){const w=canvas.getBoundingClientRect().width||200,dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(w*dpr);canvas.height=Math.round(height*dpr);const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.imageSmoothingEnabled=false;return{ctx,w,h:height};}
-  function resize(){sizes=canvases.map(c=>fit(c,270));fit($('.next-art'),60);fit($('.result-art'),$('.result-art').getBoundingClientRect().height||100);palette();draw();}
+  function resize(){sizes=canvases.map(c=>fit(c,c.getBoundingClientRect().height||230));fit($('.result-art'),$('.result-art').getBoundingClientRect().height||100);palette();renderDispatch();draw();}
   function rect(ctx,x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));}
-  function food(ctx,type,x,y,scale=1,worried=false,age=0){
+  function food(ctx,type,x,y,scale=1,worried=false,age=0,cold=false){
     ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.scale(scale,scale);
     if(type===0){
-      rect(ctx,-9,-10,16,3,colors.crumb);rect(ctx,-12,-7,22,15,colors.bean);rect(ctx,-9,8,16,3,colors.crumb);rect(ctx,-12,-4,3,8,colors.crumb);rect(ctx,-5,-7,5,3,colors.eye);
+      rect(ctx,-9,-10,16,3,cold?colors.cold:colors.crumb);rect(ctx,-12,-7,22,15,cold?colors['cold-food']:colors.bean);rect(ctx,-9,8,16,3,cold?colors.cold:colors.crumb);rect(ctx,-12,-4,3,8,cold?colors.cold:colors.crumb);rect(ctx,-5,-7,5,3,colors.eye);
       rect(ctx,-5,-1,3,3,colors.mouth);rect(ctx,3,-1,3,3,colors.mouth);rect(ctx,-1,5,3,2,colors.mouth);
     }else{
       rect(ctx,-4,-16,8,3,colors.floor);rect(ctx,-7,-13,14,3,colors.floor);rect(ctx,-10,-10,20,3,colors.floor);rect(ctx,-13,-7,26,18,colors.floor);rect(ctx,-10,11,20,3,colors.floor);
-      rect(ctx,-3,-15,6,3,colors.rice);rect(ctx,-6,-12,12,3,colors.rice);rect(ctx,-9,-9,18,3,colors.rice);rect(ctx,-12,-6,24,16,colors.rice);rect(ctx,-9,10,18,3,colors.floor);
+      rect(ctx,-3,-15,6,3,cold?colors['cold-food']:colors.rice);rect(ctx,-6,-12,12,3,cold?colors['cold-food']:colors.rice);rect(ctx,-9,-9,18,3,cold?colors['cold-food']:colors.rice);rect(ctx,-12,-6,24,16,cold?colors['cold-food']:colors.rice);rect(ctx,-9,10,18,3,cold?colors.cold:colors.floor);
       rect(ctx,-5,3,10,10,colors.seaweed);rect(ctx,-7,-2,3,3,colors.mouth);rect(ctx,4,-2,3,3,colors.mouth);
     }
     if(worried){rect(ctx,-8,-5,5,2,colors.danger);rect(ctx,3,-5,5,2,colors.danger);if(Math.floor(age*5)%2===0){rect(ctx,11,-13,3,6,colors.sweat);rect(ctx,8,-7,6,3,colors.sweat);}}
+    if(cold){
+      rect(ctx,-8,-3,6,6,colors['cold-food']);rect(ctx,3,-3,6,6,colors['cold-food']);
+      for(const eyeX of [-7,4]){rect(ctx,eyeX,-2,2,2,colors.cold);rect(ctx,eyeX+3,-2,2,2,colors.cold);rect(ctx,eyeX+1,0,3,2,colors.cold);rect(ctx,eyeX,2,2,2,colors.cold);rect(ctx,eyeX+3,2,2,2,colors.cold);}
+      rect(ctx,-3,6,6,2,colors.cold);
+      snowflake(ctx,12,-14,1);
+    }
     ctx.restore();
   }
+  function snowflake(ctx,x,y,s=1){rect(ctx,x-5*s,y-s,10*s,2*s,colors.cold);rect(ctx,x-s,y-5*s,2*s,10*s,colors.cold);for(const a of [-1,1])for(const b of [-1,1])rect(ctx,x+a*3*s-s,y+b*3*s-s,2*s,2*s,colors.cold);}
   function monster(ctx,lane,x,y,unit,active,pressure,t,pop=false){
     const body=colors[lane?'purple':'green'],shade=colors[lane?'purple-dark':'green-dark'],light=colors[lane?'purple-light':'green-light'];
     const animate=mode==='running'&&!reduced.matches;
@@ -257,17 +327,18 @@
   function drawLane(lane){
     const {ctx,w,h}=sizes[lane]||{};if(!ctx)return;
     ctx.clearRect(0,0,w,h);const q=state.lanes[lane],cx=Math.round(w/2),t=state.time;
-    const unit=w<190?3:4,monsterX=cx-8.5*unit,monsterY=260-20*unit,mouthY=monsterY+13*unit;
+    const unit=w<190?2.7:3.2,monsterX=cx-8.5*unit,monsterY=h-10-20*unit,mouthY=monsterY+13*unit;
+    const beltBottom=monsterY-4,frontY=beltBottom-13,spacing=Math.min(27,(frontY-8)/5);
     const pressure=q.length,animate=mode==='running'&&!reduced.matches;
-    if(pressure>=4){rect(ctx,cx-36,9,72,173,colors.warm);}
-    rect(ctx,cx-38,7,3,173,colors.line);rect(ctx,cx+35,7,3,173,colors.line);
-    for(let y=15;y<176;y+=18){rect(ctx,cx-40,y,7,3,colors.floor);rect(ctx,cx+33,y,7,3,colors.floor);}
-    rect(ctx,4,261,w-8,7,colors.floor);for(let x=10;x<w-10;x+=20)rect(ctx,x,263,9,2,colors.crumb);
+    if(pressure>=4){rect(ctx,cx-36,9,72,beltBottom-9,colors.warm);}
+    rect(ctx,cx-38,7,3,beltBottom-7,colors.line);rect(ctx,cx+35,7,3,beltBottom-7,colors.line);
+    for(let y=15;y<beltBottom;y+=18){rect(ctx,cx-40,y,7,3,colors.floor);rect(ctx,cx+33,y,7,3,colors.floor);}
+    rect(ctx,4,h-9,w-8,7,colors.floor);for(let x=10;x<w-10;x+=20)rect(ctx,x,h-7,9,2,colors.crumb);
     const rejectShake=animate&&t-reject[lane]<.35?Math.sin((t-reject[lane])*55)*3:0;
     monster(ctx,lane,monsterX+rejectShake,monsterY,unit,!!q.length,pressure,t,t-swallows[lane]<.42);
     const live=new Set();
     q.forEach((job,i)=>{
-      live.add(job.id);let target=171-i*27;
+      live.add(job.id);let target=frontY-i*spacing;
       const remaining=i===0?Math.max(0,job.due-t):1,swallow=i===0?Math.max(0,1-remaining/.32):0;
       const duration=i===0?E.durations[lane][job.type]:1;
       let pos=visuals[lane].get(job.id);
@@ -282,7 +353,7 @@
       if(impatient&&i>0&&pressure>=5&&(!animate||Math.floor(t*3+job.id)%3===0)){
         rect(ctx,cx+19,Math.round(y)-14,3,6,colors.danger);rect(ctx,cx+19,Math.round(y)-6,3,2,colors.danger);
       }
-      if(i===0){const progress=1-remaining/duration;rect(ctx,cx-29,265,58,3,colors.line);rect(ctx,cx-29,265,58*Math.max(0,progress),3,colors[lane?'purple':'green']);}
+      if(i===0){const progress=1-remaining/duration;rect(ctx,cx-29,h-5,58,3,colors.line);rect(ctx,cx-29,h-5,58*Math.max(0,progress),3,colors[lane?'purple':'green']);}
     });
     for(const id of visuals[lane].keys())if(!live.has(id))visuals[lane].delete(id);
     effects.filter(e=>e.lane===lane).forEach(e=>{
@@ -292,32 +363,93 @@
       ctx.fillStyle=colors[lane?'purple-dark':'green-dark'];ctx.font='600 14px Arial';ctx.textAlign='center';ctx.fillText(e.chain>=3?`连吃 ×${e.chain}`:'嗝！+1',cx,monsterY-12-(reduced.matches?0:age*18));ctx.restore();
     });
   }
-  function drawNext(){
-    const c=$('.next-art'),ctx=c.getContext('2d'),dpr=Math.min(devicePixelRatio||1,2);ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,60,60);
-    const job=state.pending[0];if(job){food(ctx,job.type,30,30,1.6,state.time-job.born>3.3,state.time);}else{rect(ctx,9,36,42,5,colors.floor);rect(ctx,14,41,32,3,colors.crumb);}
+  function renderDispatch(){
+    const list=$('.food-line');
+    const items=state.pending.map(job=>({job,upcoming:false}));
+    for(const job of state.schedule.slice(state.next,state.next+5-items.length))items.push({job,upcoming:true});
+    while(items.length<5)items.push({job:null,upcoming:false});
+    const keys=items.map((item,i)=>item.job?'food-'+item.job.id:'empty-'+i),key=keys.join(',');
+    const positions=new Map([...tickets].map(([id,r])=>[id,r.el.offsetLeft]));
+    for(const [id,r] of tickets)if(!keys.includes(id)){r.el.remove();tickets.delete(id);}
+    items.forEach((item,i)=>{
+      const id=keys[i];let record=tickets.get(id);
+      if(!record){
+        const el=document.createElement('li');el.className='food-ticket';
+        el.innerHTML='<span class="ticket-label"></span><canvas class="ticket-art" aria-hidden="true"></canvas><div class="heat-track" aria-hidden="true"><div class="heat-fill"></div></div><span class="ticket-time"></span>';
+        record={el};tickets.set(id,record);
+      }
+      record.job=item.job;record.upcoming=item.upcoming;
+      const el=record.el,left=item.job?Math.max(0,E.PATIENCE-(state.time-item.job.born)):0;
+      const status=!item.job?'empty':item.upcoming?'upcoming':left<=1.7?'urgent':left<=3.3?'warm':'hot';
+      el.dataset.status=status;el.dataset.front=String(i===0&&!!item.job&&!item.upcoming);el.dataset.foodId=item.job?.id??'';
+      text(el.querySelector('.ticket-label'),!item.job?'空位':item.upcoming?'即将':status==='urgent'?'快凉了':i===0?'先分配':'排队中');
+      text(el.querySelector('.ticket-time'),!item.job?'—':item.upcoming?Math.max(0,item.job.born-state.time).toFixed(1)+'s后':left.toFixed(1)+'s');
+      el.querySelector('.heat-fill').style.transform=`scaleX(${item.upcoming?0:Math.min(1,left/E.PATIENCE)})`;
+      el.setAttribute('aria-label',!item.job?'空位':`${i===0&&!item.upcoming?'队头，':''}${foods[item.job.type]}，${item.upcoming?'尚未到达':status==='urgent'?'快凉了，剩余'+left.toFixed(1)+'秒':'剩余热度时间'+left.toFixed(1)+'秒'}`);
+      if(list.children[i]!==el)list.insertBefore(el,list.children[i]||null);
+      if(key!==ticketKey&&mode==='running'&&!reduced.matches){const delta=positions.has(id)?positions.get(id)-el.offsetLeft:25;if(delta)el.animate([{transform:`translateX(${delta}px)`},{transform:'translateX(0)'}],{duration:180,easing:'ease-out'});}
+      record.size=fit(el.querySelector('canvas'),43);
+    });
+    ticketKey=key;
+    const last=discards.at(-1),caption=$('.loss-caption');
+    if(last){caption.dataset.kind=last.reason;text(caption,foods[last.type]+(last.reason==='cold'?'凉掉了 · +1':'被挤掉 · +1'));}
+    else{caption.dataset.kind='none';text(caption,state.lost?`本局已有 ${state.lost} 份没吃上。`:'别让热乎的食物等凉。');}
+    $('.discard-tray').setAttribute('aria-label',state.lost?`退餐盘，累计${state.lost}份损失，最近${discards.map(d=>foods[d.type]+(d.reason==='cold'?'凉掉':'被挤掉')).join('、')}`:'退餐盘暂时空着');
+  }
+  function drawDispatch(){
+    const animate=mode==='running'&&!reduced.matches;
+    for(const record of tickets.values()){
+      const {ctx,w,h}=record.size||{};if(!ctx)continue;ctx.clearRect(0,0,w,h);
+      const {job,upcoming}=record;
+      if(!job){rect(ctx,w/2-14,28,28,3,colors.line);continue;}
+      const left=E.PATIENCE-(state.time-job.born),urgent=!upcoming&&left<=1.7;
+      const shake=urgent&&animate?Math.round(Math.sin(state.time*35+job.id)*2):0;
+      food(ctx,job.type,w/2+shake,25,Math.min(1.18,w/38),urgent,animate?state.time:0);
+      if(!upcoming&&left>1.7){
+        ctx.save();ctx.globalAlpha=Math.min(.7,left/E.PATIENCE);
+        for(let i=0;i<2;i++){const rise=animate?(state.time*8+i*5)%10:4;rect(ctx,w/2-7+i*11,8-rise,2,5,colors.crumb);}ctx.restore();
+      }else if(urgent){rect(ctx,w-6,5,2,6,colors.danger);rect(ctx,w-6,13,2,2,colors.danger);}
+    }
+    const tray=$('.discard-tray'),{ctx,w,h}=fit(tray,38);ctx.clearRect(0,0,w,h);
+    rect(ctx,3,h-10,w-6,4,colors['cold-food']);rect(ctx,8,h-6,w-16,3,colors.cold);
+    const landed=discards.filter(d=>state.time-d.time>=1||mode!=='running').slice(-4);
+    landed.forEach((d,i)=>food(ctx,d.type,15+i*(w-30)/3,22,.65,false,0,d.reason==='cold'));
+    lossVisuals=lossVisuals.filter(v=>{if(state.time-v.time>=1.55){v.el.remove();return false;}return true;});
+  }
+  function showLoss(event){
+    const discarded={id:event.id,type:event.type,reason:event.reason,time:state.time};discards.push(discarded);discards=discards.slice(-4);
+    const visual=document.createElement('div');visual.className='lost-food';visual.dataset.kind=event.reason;
+    const art=document.createElement('canvas');art.setAttribute('aria-hidden','true');visual.append(art);
+    const label=document.createElement('span');label.textContent=event.reason==='cold'?'凉掉了 +1':'挤掉了 +1';visual.append(label);$('.loss-layer').append(visual);
+    const {ctx,w}=fit(art,54);food(ctx,event.type,w/2,31,1.4,false,0,event.reason==='cold');
+    lossVisuals.push({el:visual,time:state.time});
+    const row=$('.discard-row'),counter=$('[data-lost]');row.dataset.kind=event.reason;counter.style.setProperty('--loss-color',event.reason==='cold'?'var(--cold)':'var(--danger)');row.classList.remove('cold-flash');counter.classList.remove('lost-counter');void row.offsetWidth;row.classList.add('cold-flash');counter.classList.add('lost-counter');
+    notice(event.reason==='cold'?`${foods[event.type]}等凉了！变蓝的那份进退餐盘了。`:`发餐盘满了！最前面的${foods[event.type]}被新来单挤掉了。`,'warning',2.2);
+    save();
   }
   function drawResult(){
     const c=$('.result-art'),{ctx,w,h}=fit(c,c.getBoundingClientRect().height||100),u=w<150?2.5:3;
     ctx.clearRect(0,0,w,h);monster(ctx,0,w*.25-8.5*u,h-20*u,u,false,0,0);monster(ctx,1,w*.75-8.5*u,h-20*u,u,false,0,0);
   }
-  function draw(){if(!sizes.length)return;drawLane(0);drawLane(1);drawNext();if(mode==='ended')drawResult();}
+  function draw(){if(!sizes.length)return;drawLane(0);drawLane(1);drawDispatch();if(mode==='ended')drawResult();}
   function notice(message,tone='normal',duration=2.1){text($('.notice'),message);$('.notice').dataset.tone=tone;noticeUntil=state.time+duration;}
   function defaultNotice(){
     if(mode==='idle')return'看一眼队伍，再决定送给谁。';
     if(mode==='paused')return'已暂停，食物不会偷偷凉掉。';
     if(state.time>=30)return'停止来单！还有 5 秒，抓紧分配、清空队伍。';
-    if(state.time>=8&&state.time<22)return'高峰时段！擅长的那只太忙，就让另一只帮忙。';
+    if((state.time>=5&&state.time<14)||(state.time>=17&&state.time<26))return'连续同口味！别等队伍满了才分流，留意后面的来单。';
+    if(state.time>=14&&state.time<17)return'短暂喘口气。下一波要换口味了，给另一边腾位置！';
     return'青团爱豆子，紫芋爱饭团。队伍短的，也能帮忙。';
   }
   function hud(){
     const running=mode==='running';
+    const rush=(state.time>=5&&state.time<14)||(state.time>=17&&state.time<26);
+    const phase=mode==='idle'?'准备开饭':mode==='ended'?'已打烊':state.time>=30?'清台冲刺':state.time>=26?'最后来客':state.time>=17?'第 2 波连单':state.time>=14?'短暂喘口气':state.time>=5?'第 1 波连单':'热身来客';
+    text($('[data-shift]'),E.LEVELS[state.level].name+' · '+phase);text($('[data-goal]'),`目标 ${E.goal(state)} / ${state.schedule.length} 份`);$('.shift-label').dataset.rush=String(running&&rush);
     text($('[data-time]'),Math.max(0,Math.ceil(E.DURATION-state.time)));text($('[data-fed]'),state.fed);text($('[data-lost]'),state.lost);
     $('.time-fill').style.width=((E.DURATION-state.time)/E.DURATION*100)+'%';$('.time-track').setAttribute('aria-valuenow',Math.max(0,Math.ceil(E.DURATION-state.time)));
-    const job=state.pending[0];text($('[data-next-title]'),job?foods[job.type]:mode==='idle'?'等开饭':state.next===state.schedule.length?'最后清台':'等下一份');
-    text($('[data-pending]'),job?`待分配 ${state.pending.length} 份${state.time-job.born>3.3?' · 快凉了！':''}`:mode==='idle'?'食物会自动到达':'先让怪兽嚼一会儿');
-    $('[data-pending]').classList.toggle('urgent',!!job&&state.time-job.born>3.3);
-    $('.patience-fill').style.width=job?Math.max(0,1-(state.time-job.born)/E.PATIENCE)*100+'%':'0%';
-    $('.next-art').setAttribute('aria-label',job?`下一份${foods[job.type]}，待分配${state.pending.length}份`:'发餐盘暂时空着');
+    const job=state.pending[0];text($('[data-pending]'),`待分配 ${state.pending.length} / 5 份${state.pending.length===5?' · 满了！':''}`);
+    $('.canteen').dataset.gamePaused=String(!running);renderDispatch();
     laneEls.forEach((el,i)=>{
       const q=state.lanes[i],waiting=Math.max(0,q.length-1),work=E.workload(state,i),full=q.length>=E.CAPACITY;
       el.dataset.pressure=q.length>=5?'high':q.length>=4?'medium':'low';
@@ -335,15 +467,18 @@
   }
   function save(){
     if(!window.gameStorage?.setSnapshot)return;revision++;
-    window.gameStorage.setSnapshot({modelContent:{game:'小怪兽食堂',mode,secondsPlayed:Math.round(state.time),fed:state.fed,lost:state.lost,total:state.schedule.length,queues:state.lanes.map(q=>q.length)},privateContent:{game:structuredClone(state),mode,best,runId,revision}}).catch(()=>{});
+    window.gameStorage.setSnapshot({modelContent:{game:'小怪兽食堂',difficulty:E.LEVELS[state.level].name,goal:E.goal(state),mode,secondsPlayed:Math.round(state.time),fed:state.fed,lost:state.lost,total:state.schedule.length,queues:state.lanes.map(q=>q.length)},privateContent:{game:structuredClone(state),mode,best,unlocked,runId,revision,discards}}).catch(()=>{});
   }
   function showResult(persist=true){
-    const result=E.summary(state),key=String(state.seed),old=best[key]||0;
-    const ratio=result.fed/result.total;
-    text($('[data-result-title]'),ratio>=.9?'双厨配合大师！':ratio>=.7?'高峰救火队长！':ratio>=.45?'食堂顺利打烊。':'今天的饭点有点忙。');
+    const result=E.summary(state),key=state.level+':'+state.seed,old=best[key]||0;
+    const ratio=result.fed/result.total,cleared=result.fed>=E.goal(state);
+    if(cleared)unlocked=true;
+    text($('[data-result-title]'),ratio===1?'一份不剩，完美清台！':ratio>=.95?'差一点就完美了！':cleared?(state.level?'爆单守住了！':'午高峰过关！'):'这波还没守住。');
+    text($('[data-result-goal]'),cleared?`${E.LEVELS[state.level].name}目标达成 · ${Math.round(ratio*100)}% 吃进肚子`:`目标 ${E.goal(state)} 份 · 再吃掉 ${E.goal(state)-result.fed} 份就过关`);
+    $('[data-hard]').hidden=state.level!==0||!unlocked;$('[data-normal]').hidden=state.level!==1;
     text($('[data-result-fed]'),result.fed);text($('[data-result-total]'),' / '+result.total);text($('[data-result-lost]'),result.lost);text($('[data-result-left]'),result.left);text($('[data-result-wait]'),result.averageWait.toFixed(1));
     const imbalance=Math.abs(result.peak[0]-result.peak[1]);
-    text($('[data-result-copy]'),result.lost>5?'发餐盘上有些食物等凉了。下一局先快点分出去，再看两边谁能帮忙。':imbalance>=3?'有一边的队伍明显更长。下一局可以早点分流：不擅长这道菜的怪兽，也能帮忙清台。':ratio>=.85?'这一波分配得很顺！重玩相同来单，试试能否再少留一份、少等一秒。':'高峰时，按喜好分配之外，还要看看谁的队伍短。重玩同一波，试试新的分配节奏。');
+    text($('[data-result-copy]'),cleared&&state.level===0?'「爆单」已解锁：49 份来客，同样只有 35 秒。两波高峰都会更密，试试这次还能不能稳住。':result.lost>5?'发餐盘来不及腾位置。看见后面连着同一种食物时，就开始分流，别等一边彻底堵满。':result.left>=5?'分出去了，还要来得及吃完。末段多看两边的剩余秒数，长队最后可能清不完。':imbalance>=3?'一边排长队，另一边还有余力。下一局试试提前分流，也给下一波不同口味留位置。':cleared?'守住爆单了！还可以挑战一份不剩。重玩同一波，找出能更早分流的那几个时刻。':'口味、队长和接下来几份，要一起看。重玩相同来单，试试更早分流。');
     text($('[data-best]'),old?`同一波最佳：${Math.max(old,result.fed)} 份${result.fed>old?' · 这次刷新了纪录！':''}`:'同一波来单顺序保持不变，可以公平比较两次尝试。');
     best[key]=Math.max(old,result.fed);const keys=Object.keys(best);if(keys.length>8)delete best[keys[0]];
     hud();drawResult();if(persist)save();
@@ -353,7 +488,7 @@
       if(event.kind==='eat'){
         chain=state.time-lastEat<1.7?chain+1:1;lastEat=state.time;swallows[event.lane]=state.time;effects.push({...event,time:state.time,chain});
         if(chain>=3)notice(`连吃 ×${chain}！食堂节奏起来了。`,'normal',1.2);
-      }else if(event.kind==='lost')notice('发餐盘上有一份等凉了，抓紧分配下一份！','warning',1.6);
+      }else if(event.kind==='lost')showLoss(event);
       else if(event.kind==='finish'){mode='ended';showResult();}
     });
     effects=effects.filter(e=>state.time-e.time<1.1);
@@ -361,17 +496,18 @@
   function frame(now){
     if(mode!=='running'){raf=0;return;}
     const dt=lastFrame?Math.min((now-lastFrame)/1000,.1):0;lastFrame=now;
-    handle(E.step(state,dt));
-    if(state.time>=8&&milestone<1){milestone=1;notice('饭点高峰来了！这一波饭团有点多。','warning',3);}
-    if(state.time>=14&&milestone<2){milestone=2;notice('豆子大军到！留意青团的队伍。','warning',2.7);}
-    if(state.time>=30&&milestone<3){milestone=3;notice('最后 5 秒！停止来单，清台冲刺！','normal',5);}
+    const before=state.time;handle(E.step(state,dt));
+    if(before<5&&state.time>=5)notice('第一波连单！一批 3 份，提前给两边分流。','warning',3);
+    if(before<14&&state.time>=14)notice('喘口气，马上换口味！趁现在清清队伍。','normal',3);
+    if(before<17&&state.time>=17)notice('第二波到了！别把下一份送进更长的队伍。','warning',3);
+    if(before<30&&state.time>=30)notice('最后 5 秒！停止来单，清台冲刺！','normal',5);
     if(now-lastHUD>95){hud();lastHUD=now;}draw();
     if(mode==='running')raf=requestAnimationFrame(frame);else{hud();draw();raf=0;}
   }
   function run(){mode='running';lastFrame=0;noticeUntil=0;handle(E.step(state,0));hud();save();if(!raf)raf=requestAnimationFrame(frame);buttons[0].focus();}
   function pause(){if(mode!=='running')return;mode='paused';cancelAnimationFrame(raf);raf=0;lastFrame=0;noticeUntil=0;hud();draw();save();}
-  function start(newSeed){
-    cancelAnimationFrame(raf);raf=0;state=E.create(newSeed);runId=String(Date.now())+'-'+newSeed;revision=0;effects=[];visuals=[new Map(),new Map()];swallows=[-10,-10];reject=[-10,-10];queueLevels=[0,0];chain=0;lastEat=-10;milestone=0;run();
+  function start(newSeed,level=state.level){
+    cancelAnimationFrame(raf);raf=0;state=E.create(newSeed,level);runId=String(Date.now())+'-'+newSeed;revision=0;effects=[];visuals=[new Map(),new Map()];swallows=[-10,-10];reject=[-10,-10];queueLevels=[0,0];chain=0;lastEat=-10;discards=[];lossVisuals=[];$('.loss-layer').replaceChildren();run();
   }
   function send(lane){
     if(mode!=='running')return;const event=E.route(state,lane);if(!event)return;
@@ -389,6 +525,8 @@
   $('[data-resume]').addEventListener('click',run);
   $('[data-retry]').addEventListener('click',()=>start(state.seed));
   $('[data-new]').addEventListener('click',()=>start(seed()));
+  $('[data-hard]').addEventListener('click',()=>{if(unlocked)start(seed(),1);});
+  $('[data-normal]').addEventListener('click',()=>start(seed(),0));
   root.addEventListener('keydown',event=>{
     if(mode!=='running'||event.repeat||event.altKey||event.ctrlKey||event.metaKey)return;
     if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();send(event.key==='ArrowLeft'?0:1);}
