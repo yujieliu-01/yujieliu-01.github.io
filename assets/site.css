@@ -33,8 +33,9 @@ a:focus-visible, button:focus-visible { outline: 2px solid #316878; outline-offs
 .profile { position: sticky; top: 36px; min-width: 0; align-self: start; }
 .portrait-link { display: block; max-width: 175px; }
 .portrait { display: block; width: 100%; height: auto; padding: 5px; border: 1px solid var(--line); border-radius: 50%; }
-.profile-name { font-size: 1rem; line-height: 1.3; margin: 10px 0; font-weight: 700; }
-.pronouns { display: inline-block; margin-left: 4px; color: var(--muted); font-size: 10px; font-weight: 400; white-space: nowrap; }
+.profile-name { width: fit-content; max-width: 100%; font-size: 1rem; line-height: 1.4; margin: 14px 0 12px; font-weight: 700; }
+.profile-name > [lang="zh-CN"] { display: inline-block; margin-left: 5px; font-size: .88em; font-weight: 500; letter-spacing: .04em; }
+.pronouns { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.5; font-weight: 400; white-space: nowrap; text-align: center; }
 .position, .affiliation { font-size: .75rem; line-height: 1.5; margin: 0 0 10px; }
 .affiliation { margin-bottom: 20px; }
 .profile-links { list-style: none; margin: 0; padding: 0; font-size: .75rem; }
@@ -70,6 +71,12 @@ p { margin: 0 0 1.3em; }
 .publications h3 { font-size: 1rem; line-height: 1.5; font-weight: 500; margin: 0 0 4px; }
 .publications h3 a { color: inherit; text-decoration: none; }
 .publications h3 a:hover { text-decoration: underline; }
+.paper-game { display: inline-flex; width: 64px; height: 64px; padding: 0; align-items: center; justify-content: center; border: 0; border-radius: 8px; background: transparent; cursor: pointer; }
+.paper-game[hidden] { display: none; }
+.paper-game:hover { background: #f0f7f8; }
+.paper-game:focus-visible { outline: 2px solid #52adc8; outline-offset: 3px; }
+.paper-game picture, .paper-game img { display: block; width: 64px; height: 64px; }
+.paper-game img { object-fit: contain; }
 .authors, .venue { margin: 0 0 4px; font-size: .9rem; }
 .authors strong { font-weight: 600; }
 .venue em { font-style: italic; }
@@ -77,12 +84,20 @@ p { margin: 0 0 1.3em; }
 .status::before { content: "·"; margin-right: 5px; }
 .paper-note { font-size: .85rem; margin: 5px 0 0; }
 .paper-link { display: inline-block; font-size: .85rem; margin-top: 3px; }
-.background-list { margin: 22px 0 32px; }
-.background-list > div { margin-bottom: 26px; }
-.background-list dt { margin-bottom: 4px; color: var(--muted); font-size: .85rem; }
+.background-list { margin: 20px 0 0; }
+.background-list > div + div { margin-top: 20px; }
+.background-list dt { margin-bottom: 4px; font-size: .95rem; line-height: 1.5; font-weight: 600; }
+.background-dates { display: inline-block; margin-left: 6px; color: var(--muted); font-size: .85rem; font-weight: 400; }
 .background-list dd { margin: 0; }
 .background-list strong { font-weight: 600; }
 .background-list dd span { display: block; font-size: .9rem; margin-top: 3px; }
+.honors-list { margin: 0; padding-left: 20px; font-size: .9rem; line-height: 1.6; }
+.honors-list li + li { margin-top: 6px; }
+.seminar-list { list-style: none; margin: 0; padding: 0; }
+.seminar-list li + li { margin-top: 16px; }
+.seminar-list h3 { margin: 0 0 4px; font-size: .95rem; line-height: 1.5; font-weight: 600; }
+.seminar-meta { color: var(--muted); font-size: .85rem; font-weight: 400; }
+.seminar-list p { margin: 0; font-size: .9rem; line-height: 1.5; }
 .site-footer { width: 100%; background: #f2f3f3; border-top: 1px solid #bdc1c4; color: #9ba1a6; }
 .footer-inner { max-width: 1280px; min-height: 78px; margin: auto; padding: 28px 18px; display: flex; justify-content: space-between; align-items: center; gap: 20px; font-size: .6875rem; }
 .site-footer a { color: inherit; text-decoration: none; }
@@ -152,3 +167,7 @@ dialog::backdrop { background: #494e5270; backdrop-filter: blur(4px); }
 dialog.wide-game{width:min(1120px,calc(100% - 48px))}
 .game-frame-container iframe{background:#fff}
 @media(max-width:520px){dialog.wide-game{width:calc(100% - 12px)}}
+
+.paper-title-game { display: flex; align-items: center; gap: 8px; }
+.paper-title-game > a { min-width: 0; }
+.paper-title-game .paper-game { flex: 0 0 64px; margin: -5px 0; }

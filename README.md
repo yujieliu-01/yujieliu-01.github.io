@@ -6,13 +6,13 @@ A small, build-free website served by GitHub Pages from `main` at the repository
 
 ## Editing
 
-- `index.html`: About Me, CV, and email.
+- `index.html`: About Me and email.
 - `research/index.html`: research interests, papers, and work in progress.
 - `background/index.html`: appointments and education.
 - `assets/site.css`: responsive layout and visual design.
 - `assets/site.js`: mobile contact menu, compatibility with old section links, and the four on-demand games.
 - `games/`: self-contained games. No game is loaded until its small icon is selected.
-- `assets/`: portrait and public documents. The public CV omits the phone number and postal address.
+- `assets/`: portrait and public documents.
 
 To preview locally, run `python -m http.server 8747 --bind 127.0.0.1` here and open http://127.0.0.1:8747/.
 

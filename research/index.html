@@ -22,14 +22,14 @@
     <nav class="header-inner" aria-label="Main navigation">
         <a class="wordmark" href=".././">Yujie Liu</a>
         <a href="../research/" aria-current="page">Research</a>
-        <a href="../background/">Background</a>
+        <a href="../background/">Experience</a>
     </nav>
   </header>
   <div class="page-layout">
     <aside class="profile" aria-label="Profile and contact">
       <a class="portrait-link" href=".././" aria-label="Yujie Liu, home"><img class="portrait" src="../assets/profile.jpg" alt="Portrait of Yujie Liu" width="398" height="439" fetchpriority="high"></a>
       <div class="profile-copy">
-        <h2 class="profile-name">Yujie Liu <span class="pronouns">she/her</span></h2>
+        <h2 class="profile-name">Yujie Liu <span lang="zh-CN">刘玉杰</span><span class="pronouns">(she/her/她)</span></h2>
         <p class="position">Postdoctoral Research Fellow</p>
         <p class="affiliation">National University of Singapore</p>
       </div>
@@ -37,8 +37,6 @@
         <button class="profile-toggle" type="button" aria-expanded="false" aria-controls="profile-links" hidden>Follow <span aria-hidden="true">▾</span></button>
         <ul class="profile-links" id="profile-links">
           <li><svg class="contact-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-7.3 8-14a8 8 0 1 0-16 0c0 6.7 8 14 8 14Z"/><circle cx="12" cy="8" r="3" fill="white"/></svg><span>Singapore</span></li>
-          <li><a href="../assets/Yujie-Liu-CV.pdf"><svg class="contact-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="m10 13 4-4m-6 1-2 2a4 4 0 0 0 6 6l2-2m2-6 2-2a4 4 0 0 0-6-6l-2 2"/></svg>Curriculum Vitae</a></li>
-          <li><a href="../assets/Yujie-Liu-Research-Statement.pdf"><svg class="contact-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="m10 13 4-4m-6 1-2 2a4 4 0 0 0 6 6l2-2m2-6 2-2a4 4 0 0 0-6-6l-2 2"/></svg>Research Statement</a></li>
           <li><a href="mailto:yj-liu@nus.edu.sg"><svg class="contact-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 5h20v14H2z"/><path fill="none" stroke="white" stroke-width="1.5" d="m2 5 10 8L22 5"/></svg>Email</a></li>
         </ul>
       </div>
@@ -46,7 +44,6 @@
           <button class="egg fruit-egg" type="button" data-game="fruit" aria-label="Discover Fruit for Thought, a decision-making game" title="A small experiment in making choices" hidden><span class="tiny-orange" aria-hidden="true"></span></button>
           <button class="egg monster-egg" type="button" data-game="canteen" aria-label="Discover Monster Canteen, a queueing game" title="Someone is hungry for a good queue" hidden><svg viewBox="0 0 24 24" aria-hidden="true" shape-rendering="crispEdges"><path fill="currentColor" d="M5 4h4v3h6V4h4v3h3v13h-4v3h-4v-3h-4v3H6v-3H2V7h3z"/><path fill="#faf9f5" d="M6 10h4v5H6zm8 0h4v5h-4z"/><path fill="#294a37" d="M8 11h2v3H8zm6 0h2v3h-2zm-4 6h4v2h-4z"/></svg></button>
           <button class="egg bandits-egg" type="button" data-game="bandits" aria-label="Play Fruit Bandits Classic, the original version" title="Fruit Bandits · 第一版" hidden><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M8 18Q16 12 16 4Q17 13 22 18" fill="none" stroke="#6f927f" stroke-width="2"/><path d="M16 5Q21 0 25 5Q22 10 16 5" fill="#91afa0"/><circle cx="7" cy="20" r="5" fill="#c57780"/><circle cx="21" cy="21" r="5" fill="#af6474"/><path d="M5 18l2-1m12 2 2-1" stroke="#f3dce0" stroke-width="1.5" stroke-linecap="round"/></svg></button>
-          <button class="egg slots-egg" type="button" data-game="triple" aria-label="Play Fruit Bandits, the three-reel slot machines" title="Fruit Bandits · 三连水果机" hidden><svg viewBox="0 0 28 28" aria-hidden="true"><rect x="3" y="3" width="19" height="22" rx="4" fill="#e4f2f6" stroke="currentColor" stroke-width="1.5"/><path d="M7 7h11M7 21h11M25 10v10h-3" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="6" y="10" width="13" height="8" rx="1" fill="white" stroke="currentColor"/><path d="M10 11v6m5-6v6" stroke="#9dbfc9"/><circle cx="25" cy="8" r="2" fill="#ca7d82"/><path d="M8 13v2m5-2v2m4-2v2" stroke="#d0a252" stroke-width="2"/></svg></button>
           <span class="curiosity-note">stay curious.</span>
         </div>
     </aside>
@@ -55,27 +52,29 @@
         <h1 id="research-title">Research</h1>
         <p>When do simple decision rules perform well, when do they break down, and why?</p>
         <ul class="research-topics">
-          <li><strong>Stochastic systems &amp; queueing.</strong> Finite-time performance, control policies, and the role of information in congested service systems.</li>
-          <li><strong>Sequential learning &amp; decisions.</strong> How adaptive algorithms allocate samples, and how action geometry shapes learning and exploration.</li>
-          <li><strong>Stochastic model reduction.</strong> Finding simpler Markovian representations that preserve the distributional structure of complex systems.</li>
+          <li><strong>Stochastic systems &amp; queueing.</strong> Understanding and improving the performance of service systems under uncertainty.</li>
+          <li><strong>Sequential learning &amp; decisions.</strong> Learning from data to make better decisions over time.</li>
+          <li><strong>Stochastic model reduction.</strong> Developing tractable models that capture the essential features of complex stochastic systems.</li>
         </ul>
-        <p><a href="../assets/Yujie-Liu-Research-Statement.pdf">Research Statement</a></p>
       </section>
       <section id="publications" aria-labelledby="papers-title">
-        <h2 id="papers-title">Papers</h2>
+        <h2 id="papers-title">Publications</h2>
         <ol class="publications" reversed>
-          <li><article><h3><a href="https://arxiv.org/abs/2610.06213">Sampling allocation of LinUCB: Optimal design limits in the small-gap regime</a></h3><p class="authors"><strong>Yujie Liu</strong>, Vincent Y. F. Tan, and Yunbei Xu</p><p class="venue"><em>ACM SIGMETRICS 2027</em> <span class="status">Accepted</span></p><a class="paper-link" href="https://arxiv.org/abs/2610.06213">arXiv <span aria-hidden="true">↗</span></a></article></li>
-          <li><article><h3><a href="https://arxiv.org/abs/2506.18278">Finite-time minimax bounds and an optimal Lyapunov policy in queueing control</a></h3><p class="authors"><strong>Yujie Liu</strong>, Vincent Y. F. Tan, and Yunbei Xu</p><p class="venue"><em>Operations Research</em> <span class="status">Forthcoming</span></p><p class="paper-note">Short version presented at the NeurIPS 2025 Workshop on ML×OR.</p><a class="paper-link" href="https://arxiv.org/abs/2506.18278">arXiv <span aria-hidden="true">↗</span></a></article></li>
-          <li><article><h3><a href="https://arxiv.org/abs/2409.12673">A non-convex optimization approach of searching algebraic degree phase-type representations for general phase-type distributions</a></h3><p class="authors"><strong>Yujie Liu</strong>, Dacheng Yao, and Hanqin Zhang</p><p class="venue"><em>Advances in Applied Probability</em>, 57(3): 1101–1137, 2025</p><a class="paper-link" href="https://arxiv.org/abs/2409.12673">arXiv <span aria-hidden="true">↗</span></a></article></li>
-          <li><article><h3><a href="https://arxiv.org/abs/2409.09034">On substochastic inverse eigenvalue problems with the corresponding eigenvector constraints</a></h3><p class="authors"><strong>Yujie Liu</strong>, Dacheng Yao, and Hanqin Zhang</p><p class="venue"><em>SIAM Journal on Matrix Analysis and Applications</em>, 45(3): 1689–1719, 2024</p><a class="paper-link" href="https://arxiv.org/abs/2409.09034">arXiv <span aria-hidden="true">↗</span></a></article></li>
-          <li><article><h3>Minimal positive realizations for linear systems with two-different-pole transfer functions</h3><p class="authors"><strong>Yujie Liu</strong>, Dacheng Yao, and Hanqin Zhang</p><p class="venue"><em>European Journal of Control</em>, 69: 100720, 2023</p></article></li>
-          <li><article><h3>Stationary distributions and ergodicity of reflection-type Markov chains</h3><p class="authors"><strong>Yujie Liu</strong>, Minwen Niu, Dacheng Yao, and Hanqin Zhang</p><p class="venue"><em>Statistics &amp; Probability Letters</em>, 189: 109597, 2022</p></article></li>
+          <li><article><h3 class="paper-title-game"><a href="https://arxiv.org/abs/2610.06213">Sampling allocation of LinUCB: Optimal design limits in the small-gap regime</a> <button class="paper-game" type="button" data-game="triple" aria-label="Play Fruit Bandits: chubby orange cat pulling a slot machine lever" title="Play Fruit Bandits · 三连水果机" hidden><picture>
+              <source media="(prefers-reduced-motion: reduce)" srcset="../assets/cat-slot-static.png">
+              <img src="../assets/cat-slot-animated.webp" width="480" height="480" alt="" decoding="async">
+            </picture></button></h3><p class="authors"><strong>Yujie Liu</strong>, <a href="https://vyftan.github.io/">Vincent Y. F. Tan</a>, and <a href="https://yunbeixu.github.io/">Yunbei Xu</a></p><p class="venue"><em>ACM SIGMETRICS 2027</em> <span class="status">Accepted</span></p></article></li>
+          <li><article><h3><a href="https://arxiv.org/abs/2506.18278">Finite-time minimax bounds and an optimal Lyapunov policy in queueing control</a></h3><p class="authors"><strong>Yujie Liu</strong>, <a href="https://vyftan.github.io/">Vincent Y. F. Tan</a>, and <a href="https://yunbeixu.github.io/">Yunbei Xu</a></p><p class="venue"><em>Operations Research</em> <span class="status">Forthcoming</span></p><p class="paper-note">Short version presented at the NeurIPS 2025 Workshop on ML×OR.</p></article></li>
+          <li><article><h3><a href="https://arxiv.org/abs/2409.12673">A non-convex optimization approach of searching algebraic degree phase-type representations for general phase-type distributions</a></h3><p class="authors"><strong>Yujie Liu</strong>, <a href="https://sites.google.com/site/dachengyao/home?authuser=0">Dacheng Yao</a>, and <a href="https://scholar.google.com/citations?user=uHpp0M4AAAAJ&amp;hl=zh-CN">Hanqin Zhang</a></p><p class="venue"><em>Advances in Applied Probability</em>, 57(3): 1101–1137, 2025</p></article></li>
+          <li><article><h3><a href="https://arxiv.org/abs/2409.09034">On substochastic inverse eigenvalue problems with the corresponding eigenvector constraints</a></h3><p class="authors"><strong>Yujie Liu</strong>, <a href="https://sites.google.com/site/dachengyao/home?authuser=0">Dacheng Yao</a>, and <a href="https://scholar.google.com/citations?user=uHpp0M4AAAAJ&amp;hl=zh-CN">Hanqin Zhang</a></p><p class="venue"><em>SIAM Journal on Matrix Analysis and Applications</em>, 45(3): 1689–1719, 2024</p></article></li>
+          <li><article><h3>Minimal positive realizations for linear systems with two-different-pole transfer functions</h3><p class="authors"><strong>Yujie Liu</strong>, <a href="https://sites.google.com/site/dachengyao/home?authuser=0">Dacheng Yao</a>, and <a href="https://scholar.google.com/citations?user=uHpp0M4AAAAJ&amp;hl=zh-CN">Hanqin Zhang</a></p><p class="venue"><em>European Journal of Control</em>, 69: 100720, 2023</p></article></li>
+          <li><article><h3>Stationary distributions and ergodicity of reflection-type Markov chains</h3><p class="authors"><strong>Yujie Liu</strong>, Minwen Niu, <a href="https://sites.google.com/site/dachengyao/home?authuser=0">Dacheng Yao</a>, and <a href="https://scholar.google.com/citations?user=uHpp0M4AAAAJ&amp;hl=zh-CN">Hanqin Zhang</a></p><p class="venue"><em>Statistics &amp; Probability Letters</em>, 189: 109597, 2022</p></article></li>
         </ol>
       </section>
       <section id="work-in-progress" aria-labelledby="work-title">
         <h2 id="work-title">Works in Progress</h2>
-        <p>How LinUCB allocates samples: A fluid-limit analysis under local gaps.<br>With Vincent Y. F. Tan and Yunbei Xu.</p>
-        <p>Queue regulation based on waiting-time information disclosure.<br>With Dacheng Yao and Hanqin Zhang.</p>
+        <p>How LinUCB allocates samples: A fluid-limit analysis under local gaps.<br>With <a href="https://vyftan.github.io/">Vincent Y. F. Tan</a> and <a href="https://yunbeixu.github.io/">Yunbei Xu</a>.</p>
+        <p>Queue regulation based on waiting-time information disclosure.<br>With <a href="https://sites.google.com/site/dachengyao/home?authuser=0">Dacheng Yao</a> and <a href="https://scholar.google.com/citations?user=uHpp0M4AAAAJ&amp;hl=zh-CN">Hanqin Zhang</a>.</p>
       </section>
     </main>
   </div>
