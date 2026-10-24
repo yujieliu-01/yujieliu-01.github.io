@@ -142,3 +142,13 @@ dialog::backdrop { background: #494e5270; backdrop-filter: blur(4px); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* Keep every game in the same quiet sidebar collection. */
+.curiosities{flex-wrap:wrap;row-gap:2px}
+.curiosity-note{flex-basis:100%;margin:3px 0 0 6px}
+.bandits-egg svg,.slots-egg svg{width:24px;height:24px;transition:transform .2s}
+.slots-egg{color:#52adc8}
+.bandits-egg:hover svg,.slots-egg:hover svg{transform:translateY(-2px) rotate(-4deg)}
+dialog.wide-game{width:min(1120px,calc(100% - 48px))}
+.game-frame-container iframe{background:#fff}
+@media(max-width:520px){dialog.wide-game{width:calc(100% - 12px)}}

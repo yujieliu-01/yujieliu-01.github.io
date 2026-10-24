@@ -26,8 +26,8 @@
   });
   const dialog = document.querySelector('#game-dialog');
   const container = document.querySelector('.game-frame-container');
-  const titles = {fruit: 'Fruit for Thought · 水果运筹学', canteen: 'Monster Canteen · 小怪兽食堂'};
-  const paths = {fruit: 'games/fruit.html', canteen: 'games/canteen.html'};
+  const titles = {fruit: 'Fruit for Thought · 水果运筹学', canteen: 'Monster Canteen · 小怪兽食堂', bandits: 'Fruit Bandits · 第一版', triple: 'Fruit Bandits · 三连水果机'};
+  const paths = {fruit: 'games/fruit.html', canteen: 'games/canteen.html', bandits: 'games/fruit-bandits.html', triple: 'games/fruit-bandits-triple.html'};
   let trigger = null;
   let frame = null;
   let closing = false;
@@ -40,7 +40,8 @@
       frame = document.createElement('iframe');
       frame.title = titles[game];
       frame.src = new URL(paths[game], siteRoot).href;
-      document.querySelector('#game-dialog-title').textContent = game === 'fruit' ? 'A little exploration.' : 'A little coordination.';
+      document.querySelector('#game-dialog-title').textContent = titles[game];
+      dialog.classList.toggle('wide-game', game === 'triple' || game === 'bandits');
       container.replaceChildren(frame);
       document.body.classList.add('game-open');
       dialog.showModal();

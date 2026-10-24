@@ -1,0 +1,13 @@
+'use strict';
+const fs=require('node:fs'),path=require('node:path');
+const games=path.dirname(__dirname);
+let html=fs.readFileSync(path.join(games,'fruit-bandits-triple.html'),'utf8');
+html=html.replace('<link rel="stylesheet" href="bandits-triple/style.css">',()=>'<style>'+fs.readFileSync(path.join(__dirname,'style.css'),'utf8')+'</style>');
+const scripts=[];
+html=html.replace(/<script defer src="bandits-triple\/([\w.-]+)"><\/script>/g,(_,file)=>{scripts.push(fs.readFileSync(path.join(__dirname,file),'utf8'));return '';});
+html=html.replace('</body>',()=>scripts.map(s=>'<script>'+s+'</script>').join('\n')+'</body>');
+html=html.replaceAll('href="fruit-bandits.html"','href="fruit-bandits-preview.html"');
+html=html.replace('href="../"','href="academic-homepage/index.html"');
+const destination=path.resolve(process.argv[2]||path.join(games,'../../fruit-bandits-triple-preview.html'));
+fs.writeFileSync(destination,html);
+console.log('Built '+destination);
