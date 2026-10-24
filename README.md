@@ -28,7 +28,7 @@ The three-reel game uses a 100-coin budget and shuffled 40% / 50% / 60% probabil
 
 ## Panda Night Stall
 
-The animated panda night-stall icon beside the finite-time queueing paper on the Research page opens `games/panda-night-stall/` in a wide dialog. The icon uses the approved night-scene artwork: one orange cat collects a can and leaves, then one corgi collects bone soup and leaves. A static representative frame is used when the visitor prefers reduced motion.
+The animated panda stall icon beside the finite-time queueing paper on the Research page opens `games/panda-night-stall/` in a wide dialog. The panda, bamboo stall, lantern, knot and visitors use the approved artwork on a fully transparent background, so the icon blends into the white academic page. One orange cat collects a can and leaves, then one corgi collects bone soup and leaves. A transparent static representative frame is used when the visitor prefers reduced motion.
 
 The game uses the reviewed v2 artwork and continuous FIFO animation, with a 60-second round, 2.5-second batches, a backlog chart, and matched-traffic strategy comparisons. The old `games/canteen.html` remains available at its existing URL. Run `npm test --prefix games/panda-night-stall` for layout, rules, and motion regression checks. Closing the homepage dialog pauses and unloads the game.
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * Render the paper-row panda stall icon from the approved scene artwork.
+ * Render the genuinely transparent paper-row icon from approved scene artwork.
+ * No rectangular background, page-colored fill, or outside lantern haze is baked in.
  * Dependencies: @napi-rs/canvas, sharp, and an ffmpeg build with libwebp_anim.
  * Repository defaults (when this file lives in tools/):
  *   source: ../games/panda-night-stall/assets and ../games/panda-night-stall/vendor.js
@@ -47,7 +48,8 @@ const DURATION=11.6,TAU=Math.PI*2;
 if(!Number.isFinite(WIDTH)||WIDTH<160||!Number.isFinite(FPS)||FPS<8||FPS>30||!Number.isFinite(QUALITY)||QUALITY<1||QUALITY>100)
   throw new Error('Use width ≥160, fps 8–30 and quality 1–100.');
 const WORLD={width:320,height:256};
-const STALL={x:54,y:-18,width:270};
+// Leave the entire roof, leaves, knot and cabinet inside the transparent frame.
+const STALL={x:78,y:8,width:240};
 const VISITS=[{kind:'cat',start:.4},{kind:'corgi',start:5.9}];
 const PHASE={arriveEnd:1.2,foodStart:1.55,foodEnd:2.15,happyEnd:2.85,turnEnd:3.1,end:4.5};
 const clamp=n=>Math.max(0,Math.min(1,n));
@@ -125,6 +127,11 @@ async function loadVendor() {
   let matches=0;
   source=source.replace(pattern,()=>{matches++;return `new URL(part.file,${JSON.stringify(base)}).href`;});
   if(matches!==1) throw new Error('The approved vendor asset-loader shape changed; update the renderer adapter.');
+  // The full game uses this glow against its dark courtyard. An inline icon
+  // should not paint a broad amber haze over the surrounding white webpage.
+  const glow=/\bdrawLanternGlow\(ctx,time,p\);/g;
+  if((source.match(glow)||[]).length!==1) throw new Error('The vendor glow adapter needs updating.');
+  source=source.replace(glow,'/* Outside lantern glow omitted for the transparent paper icon. */');
   // A data module works in repositories with either CommonJS or ESM defaults.
   const {createVendor}=await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
   return createVendor({loadImage:url=>loadImage(url.startsWith('file:')?fileURLToPath(url):url)});
@@ -132,7 +139,7 @@ async function loadVendor() {
 
 async function encodeWebP(frames,filename,quality) {
   const args=['-hide_banner','-loglevel','error','-y','-f','image2pipe','-framerate',String(FPS),
-    '-vcodec','png','-i','pipe:0','-an','-c:v','libwebp_anim','-lossless','0',
+    '-vcodec','png','-i','pipe:0','-an','-pix_fmt','bgra','-c:v','libwebp_anim','-lossless','0',
     '-quality',String(quality),'-compression_level','6','-preset','drawing','-loop','0',filename];
   const child=spawn(ffmpeg,args,{stdio:['pipe','ignore','pipe']});
   let stderr='';child.stderr.on('data',chunk=>{stderr+=chunk.toString();});
@@ -149,7 +156,7 @@ async function encodeWebP(frames,filename,quality) {
 async function main() {
   await fs.mkdir(outputDir,{recursive:true});
   const art={};
-  await Promise.all(['background-night','cat-wait','cat-fed','corgi-wait','corgi-fed'].map(async name=>{
+  await Promise.all(['cat-wait','cat-fed','corgi-wait','corgi-fed'].map(async name=>{
     art[name]=await loadImage(path.join(assetDir,`${name}.webp`));
   }));
   const vendor=await loadVendor();
@@ -157,15 +164,13 @@ async function main() {
   const initialVendor=createCanvas(WIDTH,HEIGHT),iv=initialVendor.getContext('2d');
   iv.scale(WIDTH/WORLD.width,HEIGHT/WORLD.height);vendor.draw(iv,{...STALL,time:0});
   const movingVendor=createCanvas(WIDTH,HEIGHT),mv=movingVendor.getContext('2d');
-  const background=createCanvas(WIDTH,HEIGHT),bg=background.getContext('2d');
-  const source=art['background-night'],cover=Math.max(WIDTH/source.width,HEIGHT/source.height);
-  bg.drawImage(source,(WIDTH-source.width*cover)*.5,(HEIGHT-source.height*cover)*.45,source.width*cover,source.height*cover);
-  bg.fillStyle='rgba(8,27,41,.10)';bg.fillRect(0,0,WIDTH,HEIGHT);
-  bg.save();bg.scale(WIDTH/WORLD.width,HEIGHT/WORLD.height);
-  bg.fillStyle='rgba(53,38,32,.18)';bg.beginPath();bg.ellipse(206,246,94,7,0,0,TAU);bg.fill();bg.restore();
+  const mixedVendor=createCanvas(WIDTH,HEIGHT),mix=mixedVendor.getContext('2d');
 
   function drawFrame(time) {
-    ctx.clearRect(0,0,WIDTH,HEIGHT);ctx.drawImage(background,0,0);
+    // Start from empty RGBA every time; no scene from the previous frame survives.
+    ctx.clearRect(0,0,WIDTH,HEIGHT);
+    ctx.save();ctx.scale(WIDTH/WORLD.width,HEIGHT/WORLD.height);
+    ctx.fillStyle='rgba(40,33,27,.09)';ctx.beginPath();ctx.ellipse(222,248,78,3.5,0,0,TAU);ctx.fill();ctx.restore();
     const actor=customerAt(time);
     const flight=actor?.foodProgress;
     const handPulse=flight!==null&&flight!==undefined?Math.sin(flight*Math.PI):0;
@@ -175,16 +180,21 @@ async function main() {
     else {
       mv.clearRect(0,0,WIDTH,HEIGHT);mv.save();mv.scale(WIDTH/WORLD.width,HEIGHT/WORLD.height);
       vendor.draw(mv,{...STALL,time:vendorTime,serveCat:actor?.kind==='cat'?handPulse:0,serveDog:actor?.kind==='corgi'?handPulse:0});mv.restore();
-      ctx.drawImage(movingVendor,0,0);
-      // The empty ending dissolves into the exact opening pose. Steam never
-      // reverses, and the last and first frames match pixel for pixel.
-      if(blend>0) {ctx.save();ctx.globalAlpha=blend;ctx.drawImage(initialVendor,0,0);ctx.restore();}
+      if(blend===0) ctx.drawImage(movingVendor,0,0);
+      else {
+        // A premultiplied linear blend on an EMPTY layer. Both old RGB and old
+        // alpha fade away; source-over would leave a second arm/lantern behind.
+        mix.clearRect(0,0,WIDTH,HEIGHT);mix.save();
+        mix.globalAlpha=1-blend;mix.drawImage(movingVendor,0,0);
+        mix.globalCompositeOperation='lighter';mix.globalAlpha=blend;mix.drawImage(initialVendor,0,0);mix.restore();
+        ctx.drawImage(mixedVendor,0,0);
+      }
     }
     ctx.save();ctx.scale(WIDTH/WORLD.width,HEIGHT/WORLD.height);
     if(actor&&actor.alpha>0) {
       const sprite=art[`${actor.kind}-${actor.fed?'fed':'wait'}`],height=actor.size,width=height*sprite.width/sprite.height;
       ctx.save();ctx.globalAlpha=actor.alpha;
-      ctx.fillStyle='rgba(70,46,28,.21)';ctx.beginPath();ctx.ellipse(actor.x,actor.y+1,width*.37,height*.045,0,0,TAU);ctx.fill();
+      ctx.fillStyle='rgba(40,33,27,.13)';ctx.beginPath();ctx.ellipse(actor.x,actor.y+1,width*.37,height*.035,0,0,TAU);ctx.fill();
       ctx.translate(actor.x,actor.y-Math.max(0,actor.walk)-actor.hop);
       ctx.scale(actor.face,1);
       if(actor.moving) ctx.rotate(Math.sin(actor.local*TAU*2.5)*.012);
@@ -201,12 +211,20 @@ async function main() {
     return {png:canvas.toBuffer('image/png'),actor};
   }
 
-  const frames=[],frameCount=Math.round(DURATION*FPS);
-  let first,last,boundsFailures=0,foodStateFailures=0;
+  const frames=[],sourceAlphas=[],frameCount=Math.round(DURATION*FPS);
+  let first,last,boundsFailures=0,foodStateFailures=0,sourceBorderFailures=0;
+  const borderPixels=[];
+  for(let x=0;x<WIDTH;x++) {borderPixels.push(x,(HEIGHT-1)*WIDTH+x);}
+  for(let y=1;y<HEIGHT-1;y++) {borderPixels.push(y*WIDTH,y*WIDTH+WIDTH-1);}
   for(let i=0;i<frameCount;i++) {
     const time=i/FPS,{png,actor}=drawFrame(time);frames.push(png);
-    if(i===0) first=Buffer.from(ctx.getImageData(0,0,WIDTH,HEIGHT).data);
-    if(i===frameCount-1) last=Buffer.from(ctx.getImageData(0,0,WIDTH,HEIGHT).data);
+    const rgba=ctx.getImageData(0,0,WIDTH,HEIGHT).data;
+    const alpha=Buffer.alloc(WIDTH*HEIGHT);
+    for(let p=0;p<alpha.length;p++) alpha[p]=rgba[p*4+3];
+    sourceAlphas.push(alpha);
+    if(borderPixels.some(p=>alpha[p]!==0)) sourceBorderFailures++;
+    if(i===0) first=Buffer.from(rgba);
+    if(i===frameCount-1) last=Buffer.from(rgba);
     if(actor&&actor.alpha>.001) {
       const aspect=actor.kind==='cat'?459/512:539/512;
       const half=actor.size*aspect*.5;
@@ -214,8 +232,8 @@ async function main() {
       if(actor.fed&&actor.foodProgress!==null) foodStateFailures++;
     }
   }
-  if(boundsFailures||foodStateFailures||!first.equals(last))
-    throw new Error(`Frame QA failed: bounds=${boundsFailures}, early food=${foodStateFailures}, loop=${first.equals(last)}`);
+  if(boundsFailures||foodStateFailures||sourceBorderFailures||!first.equals(last))
+    throw new Error(`Frame QA failed: bounds=${boundsFailures}, early food=${foodStateFailures}, border=${sourceBorderFailures}, loop=${first.equals(last)}`);
   const animated=path.join(outputDir,'panda-stall-animated.webp');
   let quality=QUALITY,bytes=0;
   for(const candidate of [...new Set([QUALITY,Math.max(40,QUALITY-10),Math.max(40,QUALITY-20)])]) {
@@ -226,32 +244,71 @@ async function main() {
   const still=drawFrame(3.0).png;
   await sharp(still).webp({quality:90,effort:6}).toFile(path.join(outputDir,'panda-stall-static.webp'));
 
+  // Inspect decoded animation frames, including WebP disposal/blending, not
+  // only the input PNGs. This catches persistent transparent-frame trails.
+  const metadata=await sharp(animated,{animated:true}).metadata();
+  const {data:decoded,info}=await sharp(animated,{animated:true}).ensureAlpha().raw().toBuffer({resolveWithObject:true});
+  if(!metadata.hasAlpha||info.channels!==4) throw new Error('The encoded WebP lost its alpha channel.');
+  const encodedDurationMs=(metadata.delay||[]).reduce((sum,delay)=>sum+delay,0);
+  const pageBytes=WIDTH*HEIGHT*4,starts=[];
+  let elapsed=0,decodedCornerFailures=0,decodedBorderFailures=0,ghostPixels=0;
+  const corners=[0,WIDTH-1,(HEIGHT-1)*WIDTH,WIDTH*HEIGHT-1];
+  for(let frame=0;frame<metadata.pages;frame++) {
+    starts.push(elapsed);
+    const page=decoded.subarray(frame*pageBytes,(frame+1)*pageBytes);
+    if(corners.some(p=>page[p*4+3]!==0)) decodedCornerFailures++;
+    if(borderPixels.some(p=>page[p*4+3]!==0)) decodedBorderFailures++;
+    const sourceIndex=Math.min(sourceAlphas.length-1,Math.round(elapsed*FPS/1000));
+    const expected=sourceAlphas[sourceIndex];
+    for(let p=0;p<expected.length;p++) if(expected[p]===0&&page[p*4+3]>8) ghostPixels++;
+    elapsed+=metadata.delay[frame];
+  }
+  if(decodedCornerFailures||decodedBorderFailures||ghostPixels)
+    throw new Error(`Decoded alpha QA failed: corners=${decodedCornerFailures}, border=${decodedBorderFailures}, ghost pixels=${ghostPixels}`);
+
   const moments=[
     [0,'empty opening'],[1.1,'cat approaches'],[2.25,'fish in flight'],[3.0,'cat receives'],
     [4.2,'cat leaves'],[5.2,'empty pause'],[6.6,'corgi approaches'],[7.8,'soup in flight'],
     [8.5,'corgi receives'],[9.7,'corgi leaves'],[10.6,'empty ending'],[11.55,'opening pose'],
   ];
-  const sheet=createCanvas(1280,1200),sc=sheet.getContext('2d');
-  sc.fillStyle='#f3f0e7';sc.fillRect(0,0,sheet.width,sheet.height);
-  sc.fillStyle='#213b3b';sc.font='bold 22px sans-serif';sc.fillText('Panda paper icon · 11.6 s loop',16,30);
-  sc.font='14px sans-serif';sc.fillText('One customer at a time · food arrives before filled state · opening and ending match',16,52);
-  for(let i=0;i<moments.length;i++) {
-    const [time,label]=moments[i],image=await loadImage(drawFrame(time).png),x=(i%4)*320,y=68+Math.floor(i/4)*292;
-    sc.fillStyle='#213b3b';sc.font='14px sans-serif';sc.fillText(`${time.toFixed(2)} s · ${label}`,x+8,y+18);
-    sc.drawImage(image,x,y+28,320,256);
+  const proofImages=await Promise.all(moments.map(async([time])=>{
+    let frame=starts.findLastIndex(start=>start<=time*1000);
+    if(frame<0) frame=0;
+    const pixels=decoded.subarray(frame*pageBytes,(frame+1)*pageBytes);
+    return loadImage(await sharp(pixels,{raw:{width:WIDTH,height:HEIGHT,channels:4}}).png().toBuffer());
+  }));
+  function checker(context,x,y,width,height,cell=12) {
+    context.fillStyle='#ffffff';context.fillRect(x,y,width,height);
+    context.fillStyle='#e3e5e7';
+    for(let row=0;row<height/cell;row++) for(let col=0;col<width/cell;col++) if((row+col)%2===0)
+      context.fillRect(x+col*cell,y+row*cell,Math.min(cell,width-col*cell),Math.min(cell,height-row*cell));
   }
-  sc.font='bold 18px sans-serif';sc.fillText('Actual webpage size · 80 × 64 px',16,970);
-  for(let i=0;i<moments.length;i++) {
-    const [time,label]=moments[i],image=await loadImage(drawFrame(time).png),x=16+(i%6)*208,y=986+Math.floor(i/6)*102;
-    sc.drawImage(image,x,y,80,64);sc.font='12px sans-serif';sc.fillText(`${time.toFixed(2)} s · ${label}`,x,y+81);
+  for(const mode of ['white','checker']) {
+    const sheet=createCanvas(1280,1200),sc=sheet.getContext('2d');
+    sc.fillStyle='#ffffff';sc.fillRect(0,0,sheet.width,sheet.height);
+    sc.fillStyle='#213b3b';sc.font='bold 22px sans-serif';sc.fillText(`Transparent panda paper icon · ${mode} proof`,16,30);
+    sc.font='14px sans-serif';sc.fillText('Decoded WebP frames · full stall silhouette · no outside haze · all frame borders alpha = 0',16,52);
+    for(let i=0;i<moments.length;i++) {
+      const [time,label]=moments[i],x=(i%4)*320,y=68+Math.floor(i/4)*292;
+      sc.fillStyle='#213b3b';sc.font='14px sans-serif';sc.fillText(`${time.toFixed(2)} s · ${label}`,x+8,y+18);
+      if(mode==='checker') checker(sc,x,y+28,320,256);
+      sc.drawImage(proofImages[i],x,y+28,320,256);
+    }
+    sc.fillStyle='#213b3b';sc.font='bold 18px sans-serif';sc.fillText('Actual webpage size · 80 × 64 px',16,970);
+    for(let i=0;i<moments.length;i++) {
+      const [time,label]=moments[i],x=16+(i%6)*208,y=986+Math.floor(i/6)*102;
+      if(mode==='checker') checker(sc,x,y,80,64,6);
+      sc.drawImage(proofImages[i],x,y,80,64);sc.fillStyle='#213b3b';sc.font='12px sans-serif';sc.fillText(`${time.toFixed(2)} s · ${label}`,x,y+81);
+    }
+    const png=sheet.toBuffer('image/png');
+    await fs.writeFile(path.join(outputDir,`contact-sheet-${mode}.png`),png);
+    if(mode==='white') await fs.writeFile(path.join(outputDir,'contact-sheet.png'),png);
   }
-  await fs.writeFile(path.join(outputDir,'contact-sheet.png'),sheet.toBuffer('image/png'));
-  const metadata=await sharp(animated,{animated:true}).metadata();
-  const encodedDurationMs=(metadata.delay||[]).reduce((sum,delay)=>sum+delay,0);
   console.log(JSON.stringify({animated,static:path.join(outputDir,'panda-stall-static.webp'),width:WIDTH,height:HEIGHT,
     fps:FPS,sourceFrames:frameCount,encodedFrames:metadata.pages,requestedDurationSeconds:DURATION,
     encodedDurationMs,loop:metadata.loop,quality,
-    bytes,underTarget:bytes<=TARGET_BYTES,loopFramesIdentical:first.equals(last),boundsFailures,foodStateFailures},null,2));
+    bytes,underTarget:bytes<=TARGET_BYTES,hasAlpha:metadata.hasAlpha,loopFramesIdentical:first.equals(last),
+    boundsFailures,foodStateFailures,sourceBorderFailures,decodedCornerFailures,decodedBorderFailures,ghostPixels},null,2));
 }
 
 main().catch(error=>{console.error(error.stack||error);process.exitCode=1;});
